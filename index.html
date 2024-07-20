@@ -231,7 +231,7 @@
 
         async function getChatCompletion(userMessage) {
             const response = inference.chatCompletionStream({
-                model: "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",
+                model: "meta-llama/Llama-2-7b-chat-hf",
                 messages: [{ role: "user", content: userMessage }],
                 max_tokens: 500
             });
