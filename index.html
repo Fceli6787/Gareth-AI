@@ -231,7 +231,7 @@
 
         async function getChatCompletion(userMessage) {
             const response = inference.chatCompletionStream({
-                model: "mistralai/Mistral-7B-Instruct-v0.3",
+                model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
                 messages: [{ role: "user", content: userMessage }],
                 max_tokens: 500
             });
