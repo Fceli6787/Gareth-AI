@@ -1,2 +1,3 @@
 # Gareth-AI
-Chatbot use LLM Mistral-7B 
+Chatbot use LLM's 
+
