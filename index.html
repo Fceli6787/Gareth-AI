@@ -4,256 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gareth AI</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body, html {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f0f0;
-        }
-        #chat-container {
-            display: none;
-            flex-direction: column;
-            height: 100vh;
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: white;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
-        #chat-header {
-            background-color: #4a90e2;
-            color: white;
-            padding: 20px;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
             text-align: center;
+        }
+       .maintenance-page {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+       .main-title {
             font-size: 24px;
             font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
-        #chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            scroll-behavior: smooth;
+       .text {
+            font-size: 18px;
+            margin-bottom: 20px;
         }
-        #user-input {
-            display: flex;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-top: 1px solid #e0e0e0;
+        a {
+            text-decoration: none;
+            color: #337ab7;
         }
-        #message-input {
-            flex: 1;
-            padding: 12px 20px;
-            font-size: 16px;
-            border: 2px solid #4a90e2;
-            border-radius: 25px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        #message-input:focus {
-            border-color: #3a7bc8;
-        }
-        #send-button {
-            padding: 12px 25px;
-            background-color: #4a90e2;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            margin-left: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            transition: background-color 0.3s, transform 0.1s;
-        }
-        #send-button:hover {
-            background-color: #3a7bc8;
-        }
-        #send-button:active {
-            transform: scale(0.98);
-        }
-        .message {
-            max-width: 80%;
-            margin-bottom: 15px;
-            padding: 15px 20px;
-            border-radius: 20px;
-            font-size: 16px;
-            line-height: 1.4;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            animation: fadeIn 0.5s;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .bot-message {
-            align-self: flex-start;
-            background-color: #e6f2ff;
-            color: #333;
-            border-bottom-left-radius: 5px;
-        }
-        .user-message {
-            align-self: flex-end;
-            background-color: #4a90e2;
-            color: white;
-            border-bottom-right-radius: 5px;
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div id="chat-container">
-        <div id="chat-header">Gareth AI</div>
-        <div id="chat-messages"></div>
-        <div id="user-input">
-            <input type="text" id="message-input" placeholder="Escribe tu mensaje...">
-            <button id="send-button">Enviar</button>
-        </div>
+    <div class="maintenance-page">
+        <h2 class="main-title">Nos encontramos en mantenimiento</h2>
+        <p class="text">Nuestro sitio web está actualmente en mantenimiento para brindarte una mejor experiencia. Estamos implementando nuevas funciones y mejoras que harán que tu visita sea aún más satisfactoria.</p>
+        <p class="text">Agradecemos tu paciencia y comprensión. ¡Vuelve pronto para disfrutar de las novedades!</p>
     </div>
-
-    <script type="module">
-        import { HfInference } from 'https://cdn.jsdelivr.net/npm/@huggingface/inference/+esm';
-
-        const inference = new HfInference("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");
-
-        const chatContainer = document.getElementById('chat-container');
-        const chatMessages = document.getElementById('chat-messages');
-        const messageInput = document.getElementById('message-input');
-        const sendButton = document.getElementById('send-button');
-
-        function mostrarTerminosYCondiciones() {
-            Swal.fire({
-                title: 'Términos y Condiciones',
-                html: `
-                    <div style="max-height: 60vh; overflow-y: auto;">
-                        <h3>Acreditación y Reconocimiento</h3>
-                        <p>El chatbot que está interactuando con usted fue elaborado utilizando el modelo de lenguaje "Mistral-7B-Instruct-v0.3", propiedad de Mistral AI y Hugging Face Inc. y desarrollado por los siguientes autores:</p>
-                        <ul>
-                            <li>Georgi Gerganov</li>
-                            <li>Iwan Kawrakow</li>
-                            <li>Jeffrey Quesnelle</li>
-                            <li>Bowen Peng</li>
-                            <li>Yuji Hirose</li>
-                            <li>Niels Lohmann</li>
-                            <li>Bjoern Hoehrmann</li>
-                            <li>Sean Barrett</li>
-                        </ul>
-                        <p>El modelo Mistral-7B-Instruct-v0.3 utiliza una licencia MIT, que permite el uso gratuito y la redistribución del software, siempre que se cumplan ciertas condiciones. Además, el modelo está sujeto a las condiciones establecidas en la licencia NorLLM, que limita el acceso a estudiantes, empresas y organizaciones de países nórdicos.</p>
-                        <p>El desarrollo del modelo NorwAI-Mistral-7B-instruct fue liderado por el centro de investigación NowAI de la Universidad Noruega de Ciencia y Tecnología (NTNU), en colaboración con Schibsted, NRK, VG y la Biblioteca Nacional de Noruega.</p>
-                        <h3>Reconocimiento de los derechos de autor</h3>
-                        <p>Al interactuar con este chatbot, usted reconoce que los derechos de autor y la propiedad intelectual del modelo Mistral-7B-Instruct-v0.3 pertenecen a Mistral AI y Hugging Face Inc. y a los autores mencionados anteriormente.</p>
-                        <h3>Agradecimientos</h3>
-                        <p>Agradecemos a los autores y propietarios del modelo Mistral-7B-Instruct-v0.3 por permitir el uso de este modelo en nuestro chatbot. Su trabajo y contribución al desarrollo de la inteligencia artificial son muy valorados.</p>
-                        <h3>Nota</h3>
-                        <p>Este chatbot es un proyecto (NO TIENE MEMORIA PARA RECORDAR RESPUESTAS ANTERIORES), y no tiene relación oficial con Mistral AI, Hugging Face Inc. o la Universidad Noruega de Ciencia y Tecnología (NTNU).</p>
-                    </div>
-                `,
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Acepto',
-                cancelButtonText: 'No acepto',
-                width: '70%',
-                heightAuto: false,
-                customClass: {
-                    container: 'custom-swal-container',
-                    popup: 'custom-swal-popup',
-                    content: 'custom-swal-content'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    chatContainer.style.display = 'flex';
-                    agregarMensaje("¡Hola! Soy Gareth AI. ¿En qué puedo ayudarte hoy?");
-                } else {
-                    Swal.fire(
-                        'Acceso Denegado',
-                        'Debes aceptar los Términos y Condiciones para usar el chatbot.',
-                        'error'
-                    );
-                }
-            });
-        }
-
-        function agregarMensaje(mensaje, isUser = false) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message');
-            messageElement.classList.add(isUser ? 'user-message' : 'bot-message');
-            chatMessages.appendChild(messageElement);
-            scrollToBottom();
-
-            if (!isUser) {
-                mostrarTextoConEfecto(messageElement, mensaje);
-            } else {
-                messageElement.textContent = mensaje;
-            }
-        }
-
-        function mostrarTextoConEfecto(elemento, texto) {
-            let index = 0;
-            const velocidad = 30;
-
-            function mostrarCaracter() {
-                if (index < texto.length) {
-                    elemento.textContent += texto.charAt(index);
-                    index++;
-                    scrollToBottom();
-                    setTimeout(mostrarCaracter, velocidad);
-                }
-            }
-
-            mostrarCaracter();
-        }
-
-        function scrollToBottom() {
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        async function handleUserInput() {
-            const userMessage = messageInput.value.trim();
-            if (userMessage !== '') {
-                agregarMensaje(userMessage, true);
-
-                try {
-                    const botResponse = await getChatCompletion(userMessage);
-                    agregarMensaje(botResponse, false);
-                } catch (error) {
-                    console.error('Error al obtener respuesta del modelo:', error);
-                    agregarMensaje('Lo siento, hubo un error al procesar tu solicitud.', false);
-                }
-
-                messageInput.value = '';
-            }
-        }
-
-        async function getChatCompletion(userMessage) {
-            const response = inference.chatCompletionStream({
-                model: "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO",
-                messages: [{ role: "user", content: userMessage }],
-                max_tokens: 500
-            });
-
-            let responseText = '';
-            for await (const chunk of response) {
-                responseText += chunk.choices[0]?.delta?.content || "";
-            }
-
-            return responseText;
-        }
-
-        sendButton.addEventListener('click', handleUserInput);
-
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                handleUserInput();
-            }
-        });
-
-        // Mostrar los Términos y Condiciones al cargar la página
-        window.onload = mostrarTerminosYCondiciones;
-    </script>
 </body>
 </html>
