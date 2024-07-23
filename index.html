@@ -497,7 +497,7 @@ body:not(.dark-mode) #message-input {
             const response = await inference.chatCompletion({
                 model: selectedModel,
                 messages: context,
-                max_tokens: 3072
+                max_tokens: 3500
             });
 
             return response.choices[0].message.content;
