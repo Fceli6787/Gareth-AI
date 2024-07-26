@@ -431,6 +431,16 @@ body:not(.dark-mode) #message-input {
         max-height: 25vh;
     }
 }
+        /* CSS para estilizar el checkbox de texto a voz */
+        #text-to-speech-container {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        #text-to-speech-toggle {
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -457,6 +467,10 @@ body:not(.dark-mode) #message-input {
                 <input type="text" id="message-input" placeholder="Escribe tu mensaje...">
                 <button id="send-button">Enviar</button>
             </div>
+            <div>
+                <label for="text-to-speech-toggle">Texto a voz</label>
+                <input type="checkbox" id="text-to-speech-toggle">
+            </div>
         </div>
     </div>
 
@@ -471,6 +485,7 @@ body:not(.dark-mode) #message-input {
         const sendButton = document.getElementById('send-button');
         const modelSelect = document.getElementById('model-select');
         const changeModelButton = document.getElementById('change-model-button');
+        const textToSpeechToggle = document.getElementById('text-to-speech-toggle');
 
         let context = [];
 
@@ -531,6 +546,11 @@ body:not(.dark-mode) #message-input {
 
             // Agregar mensaje al contexto
             context.push({ role: isUser ? "user" : "assistant", content: mensaje });
+
+            // Convertir texto a voz si está activado
+            if (!isUser && textToSpeechToggle.checked) {
+                speechSynthesis.speak(new SpeechSynthesisUtterance(mensaje));
+            }
         }
 
         function renderizarLaTeX(elemento) {
@@ -577,7 +597,7 @@ body:not(.dark-mode) #message-input {
 
                     if (/hora|tiempo/.test(userMessage.toLowerCase())) {
                         botResponse = await getCurrentTime();
-                    } else if (/día|dia|fecha/.test(userMessage.toLowerCase())) {
+                    } else if (/día|fecha/.test(userMessage.toLowerCase())) {
                         botResponse = await getCurrentDate();
                     } else {
                         const searchResult = await searchDuckDuckGo(userMessage);
@@ -644,10 +664,17 @@ body:not(.dark-mode) #message-input {
         });
         changeModelButton.addEventListener('click', cambiarModelo);
 
+        sendButton.addEventListener('click', handleUserInput);
+        messageInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                handleUserInput();
+            }
+        });
+        changeModelButton.addEventListener('click', cambiarModelo);
+
         window.addEventListener('load', () => {
             mostrarTerminosYCondiciones();
 
-            // Manejar el cambio de tema
             const themeSwitch = document.getElementById('theme-switch');
             themeSwitch.addEventListener('change', (event) => {
                 if (event.target.checked) {
