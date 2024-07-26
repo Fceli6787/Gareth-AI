@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-python.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Nanum+Gothic&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Nanum+Gothic&display=swap');
 
 body, html {
     height: 100%;
@@ -577,7 +577,7 @@ body:not(.dark-mode) #message-input {
 
                     if (/hora|tiempo/.test(userMessage.toLowerCase())) {
                         botResponse = await getCurrentTime();
-                    } else if (/día|fecha|dia/.test(userMessage.toLowerCase())) {
+                    } else if (/día|dia|fecha/.test(userMessage.toLowerCase())) {
                         botResponse = await getCurrentDate();
                     } else {
                         const searchResult = await searchDuckDuckGo(userMessage);
@@ -601,13 +601,13 @@ body:not(.dark-mode) #message-input {
         }
 
         async function getCurrentTime() {
-            const response = await fetch('http://worldtimeapi.org/api/ip');
+            const response = await fetch('https://worldtimeapi.org/api/ip');
             const data = await response.json();
             return `La hora actual es ${data.datetime.slice(11, 19)}`;
         }
 
         async function getCurrentDate() {
-            const response = await fetch('http://worldtimeapi.org/api/ip');
+            const response = await fetch('https://worldtimeapi.org/api/ip');
             const data = await response.json();
             return `La fecha actual es ${data.datetime.slice(0, 10)}`;
         }
@@ -660,4 +660,3 @@ body:not(.dark-mode) #message-input {
     </script>
 </body>
 </html>
-
