@@ -626,13 +626,13 @@ async function handleUserInput() {
         try {
             let botResponse;
 
-            if (/hora|tiempo/.test(userMessage.toLowerCase())) {
-                botResponse = await getCurrentTime();
+            if (/hora|tiempo/.test(userMessage.toLowerCase()) &&!/ahora/.test(userMessage.toLowerCase())) {
+            botResponse = await getCurrentTime();
             } else if (/día|dia|fecha/.test(userMessage.toLowerCase())) {
-                botResponse = await getCurrentDate();
+            botResponse = await getCurrentDate();
             } else {
-                const searchResult = await searchDuckDuckGo(userMessage);
-                botResponse = await getChatCompletion(userMessage, searchResult);
+            const searchResult = await searchDuckDuckGo(userMessage);
+            botResponse = await getChatCompletion(userMessage, searchResult);
             }
 
             agregarMensaje(botResponse, false);
