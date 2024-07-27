@@ -433,14 +433,45 @@ body:not(.dark-mode) #message-input {
 }
         /* CSS para estilizar el checkbox de texto a voz */
         #text-to-speech-container {
-            margin-top: 20px;
-            display: flex;
-            align-items: center;
-        }
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative; /* Añadido para el posicionamiento del pseudo-elemento */
+}
 
-        #text-to-speech-toggle {
-            margin-left: 10px;
-        }
+#text-to-speech-toggle {
+    margin-left: 10px;
+    width: 20px;
+    height: 20px;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    vertical-align: middle; /* Alinea verticalmente con el texto */
+    position: relative; /* Para el posicionamiento del pseudo-elemento */
+}
+
+#text-to-speech-toggle:checked {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+}
+
+#text-to-speech-toggle:checked::before {
+    content: "\2713";
+    font-size: 16px;
+    color: #fff;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
     </style>
 </head>
 <body>
@@ -453,7 +484,7 @@ body:not(.dark-mode) #message-input {
                 <option value="NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO">Mixtral-8x7B</option>
             </select>
             <button id="change-model-button">Cambiar Modelo</button>
-            <div>
+            <div id="text-to-speech-container">
                 <label for="text-to-speech-toggle">Texto a voz</label>
                 <input type="checkbox" id="text-to-speech-toggle">
             </div>
@@ -597,7 +628,7 @@ async function handleUserInput() {
 
             if (/hora|tiempo/.test(userMessage.toLowerCase())) {
                 botResponse = await getCurrentTime();
-            } else if (/día|fecha/.test(userMessage.toLowerCase())) {
+            } else if (/día|dia|fecha/.test(userMessage.toLowerCase())) {
                 botResponse = await getCurrentDate();
             } else {
                 const searchResult = await searchDuckDuckGo(userMessage);
