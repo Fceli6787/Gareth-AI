@@ -472,6 +472,27 @@ body:not(.dark-mode) #message-input {
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
+#ayuda {
+    margin-top: 20px;
+    padding: 12px 25px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+#ayuda:hover {
+    background-color: #3a7bc8;
+}
+
+#ayuda:active {
+    transform: scale(0.98);
+}
     </style>
 </head>
 <body>
@@ -484,6 +505,9 @@ body:not(.dark-mode) #message-input {
                 <option value="NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO">Mixtral-8x7B</option>
             </select>
             <button id="change-model-button">Cambiar Modelo</button>
+            <div>
+                <button id="ayuda">¿Necesitas ayuda?</button>
+            </div>
             <div id="text-to-speech-container">
                 <label for="text-to-speech-toggle">Texto a voz</label>
                 <input type="checkbox" id="text-to-speech-toggle">
