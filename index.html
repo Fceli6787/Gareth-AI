@@ -10,6 +10,11 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
+    <script>
+        // Configurar el worker de PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js';
+    </script>
     <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Nanum+Gothic&display=swap');
 
@@ -493,10 +498,78 @@ body:not(.dark-mode) #message-input {
 #ayuda:active {
     transform: scale(0.98);
 }
+
+#upload-document-button {
+    margin-top: 20px;
+    padding: 12px 25px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+#upload-document-button:focus {
+    border-color: #3a7bc8;
+}
+
+.file-container {
+            position: relative;
+            width: 100%;
+            display: inline-block;
+        }
+
+        .custom-file-input {
+            width: 100%;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            outline: none;
+            opacity: 0; /* Oculta el input */
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            z-index: 2; /* Asegura que el input esté encima del label */
+        }
+
+        .custom-file-label {
+            display: inline-block;
+            width: 90%;
+            padding: 11px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            text-align: center;
+            line-height: 1; /* Ajusta esto según el tamaño del input */
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        .custom-file-label:hover {
+            background-color: #3a7bc8;
+            transform: scale(1.02); /* Efecto de aumento */
+        }
+
+        .custom-file-label:focus {
+            outline: none; /* Quita el borde de enfoque del label */
+        }
     </style>
 </head>
 <body>
+    <!-- Contenedor principal -->
     <div id="main-container">
+        <!-- Barra lateral -->
         <div id="sidebar">
             <p>Modelos Disponibles</p>
             <select id="model-select">
@@ -505,14 +578,23 @@ body:not(.dark-mode) #message-input {
                 <option value="NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO">Mixtral-8x7B</option>
             </select>
             <button id="change-model-button">Cambiar Modelo</button>
-            <div>
-                <button id="ayuda">¿Necesitas ayuda?</button>
-            </div>
+            <button id="ayuda">¿Necesitas ayuda?</button>
             <div id="text-to-speech-container">
                 <label for="text-to-speech-toggle">Texto a voz</label>
                 <input type="checkbox" id="text-to-speech-toggle">
             </div>
+            <!-- Nuevo botón para cargar documentos -->
+             <div>
+                <div class="file-container">
+                    <p>Procesador de PDF (Beta)</p>
+                    <p>Peso Maximo (1MB)</p>
+                    <input type="file" id="file-input" class="custom-file-input">
+                    <label for="file-input" class="custom-file-label">Elegir archivo</label>
+                </div>        
+                <button id="upload-document-button">Cargar Documento</button>
+             </div>
         </div>
+        <!-- Contenedor de chat -->
         <div id="chat-container">
             <div id="chat-header">
                 Gareth AI
@@ -521,7 +603,10 @@ body:not(.dark-mode) #message-input {
                     <label for="theme-switch" class="theme-label"></label>
                 </div>
             </div>
-            <div id="chat-messages"></div>
+            <div id="chat-messages">
+                <!-- Mensaje de "Gareth está escribiendo..." -->
+                <div id="typing-indicator" style="display: none;">Gareth está escribiendo...</div>
+            </div>
             <div id="user-input">
                 <input type="text" id="message-input" placeholder="Escribe tu mensaje...">
                 <button id="send-button">Enviar</button>
@@ -529,233 +614,295 @@ body:not(.dark-mode) #message-input {
         </div>
     </div>
 
+    <!-- Aquí incluir el script -->
     <script type="module">
-        import { HfInference } from 'https://cdn.jsdelivr.net/npm/@huggingface/inference/+esm';
-        
-        const inference = new HfInference("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"); 
-        
-        const chatContainer = document.getElementById('chat-container');
-        const chatMessages = document.getElementById('chat-messages');
-        const messageInput = document.getElementById('message-input');
-        const sendButton = document.getElementById('send-button');
-        const modelSelect = document.getElementById('model-select');
-        const changeModelButton = document.getElementById('change-model-button');
-        const textToSpeechToggle = document.getElementById('text-to-speech-toggle');
-        
-        let context = [];
-        
-        function mostrarTerminosYCondiciones() {
-            Swal.fire({
-                title: 'Términos y Condiciones',
-                html: 
-                    `<!-- Contenido de los términos y condiciones aquí -->
-                     <p>Aceptas los términos y condiciones de este bot.</p>
-                     <p>Que usa tecnología de empresas como Microsoft, Mistral y Yi</p>
-                     <p>El contenido generado puede ser inexacto o falso en algunos casos
-                        por eso se requiere verificar con una segunda respuesta</p>`
-                ,
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Acepto',
-                cancelButtonText: 'No acepto',
-                width: '70%',
-                heightAuto: false,
-                customClass: {
-                    container: 'custom-swal-container',
-                    popup: 'custom-swal-popup',
-                    content: 'custom-swal-content'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    chatContainer.style.display = 'flex';
-                    agregarMensaje("¡Hola! Soy Gareth. ¿En qué puedo ayudarte hoy?", false);
-                } else {
-                    Swal.fire(
-                        'Acceso Denegado',
-                        'Debes aceptar los Términos y Condiciones para usar el chatbot.',
-                        'error'
-                    );
-                }
-            });
+import { HfInference } from 'https://cdn.jsdelivr.net/npm/@huggingface/inference/+esm';
+
+const inference = new HfInference("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");
+
+const chatContainer = document.getElementById('chat-container');
+const chatMessages = document.getElementById('chat-messages');
+const messageInput = document.getElementById('message-input');
+const sendButton = document.getElementById('send-button');
+const modelSelect = document.getElementById('model-select');
+const changeModelButton = document.getElementById('change-model-button');
+const textToSpeechToggle = document.getElementById('text-to-speech-toggle');
+const fileInput = document.getElementById('file-input');
+const uploadDocumentButton = document.getElementById('upload-document-button');
+const typingIndicator = document.getElementById('typing-indicator');
+const ayudaButton = document.getElementById('ayuda');
+
+let context = [];
+let documentoContenido = '';
+
+function mostrarTerminosYCondiciones() {
+    Swal.fire({
+        title: 'Términos y Condiciones',
+        html: 
+            `<p>Aceptas los términos y condiciones de este bot.</p>
+             <p>Que usa tecnología de empresas como Microsoft, Mistral y Yi</p>
+             <p>El contenido generado puede ser inexacto o falso en algunos casos
+                por eso se requiere verificar con una segunda respuesta</p>`
+        ,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Acepto',
+        cancelButtonText: 'No acepto',
+        width: '70%',
+        heightAuto: false,
+        customClass: {
+            container: 'custom-swal-container',
+            popup: 'custom-swal-popup',
+            content: 'custom-swal-content'
         }
-        
-        function agregarMensaje(mensaje, isUser = false) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message');
-            messageElement.classList.add(isUser ? 'user-message' : 'bot-message');
-            
-            // Procesar bloques de código
-            mensaje = mensaje.replace(/```(\w+)?\n([\s\S]*?)```/g, function(match, lang, code) {
-                return `<div class="code-block" data-language="${lang || 'plaintext'}">
-                    <pre><code class="language-${lang || 'plaintext'}">${code.trim()}</code></pre>
-                </div>`;
-            });
-            
-            messageElement.innerHTML = mensaje;
-            chatMessages.appendChild(messageElement);
-            scrollToBottom();
-            renderizarLaTeX(messageElement);
-            Prism.highlightAllUnder(messageElement);
-        
-            // Agregar mensaje al contexto
-            context.push({ role: isUser ? "user" : "assistant", content: mensaje });
-        
-            // Convertir texto a voz si está activado
-            if (!isUser && textToSpeechToggle.checked) {
-                speechSynthesis.speak(new SpeechSynthesisUtterance(mensaje));
-            }
-        }
-        
-        function renderizarLaTeX(elemento) {
-            const textoOriginal = elemento.innerHTML;
-            const regex = /(\$\$[\s\S]*?\$\$|\$[^\n$]*?\$)/g;
-            let resultado = '';
-            let ultimoIndice = 0;
-        
-            textoOriginal.replace(regex, (match, formula, indice) => {
-                resultado += textoOriginal.slice(ultimoIndice, indice);
-                
-                try {
-                    const esDisplayMode = formula.startsWith('$$');
-                    const formulaLimpia = formula.slice(esDisplayMode ? 2 : 1, -1 * (esDisplayMode ? 2 : 1));
-                    const formulaRendered = katex.renderToString(formulaLimpia, {
-                        displayMode: esDisplayMode,
-                        throwOnError: false
-                    });
-                    resultado += formulaRendered;
-                } catch (error) {
-                    console.error('Error al renderizar LaTeX:', error);
-                    resultado += formula;
-                }
-        
-                ultimoIndice = indice + formula.length;
-            });
-        
-            resultado += textoOriginal.slice(ultimoIndice);
-        
-            elemento.innerHTML = resultado;
-        }
-        
-        function scrollToBottom() {
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-        
-        // Función para verificar si la pregunta es específicamente sobre la hora
-        function isPreguntaHora(mensaje) {
-            const patronesHora = [
-                /^(?:qué|que) hora es\??$/i,
-                /^(?:me dices|me puedes decir) la hora\??$/i,
-                /^(?:sabes|sab[ée]s) (?:cu[áa]l es )?la hora(?: actual)?\??$/i,
-                /^d[íi]me la hora(?: por favor)?\??$/i
-            ];
-            return patronesHora.some(patron => patron.test(mensaje.trim()));
-        }
-        
-        // Función para verificar si la pregunta es específicamente sobre la fecha
-        function isPreguntaFecha(mensaje) {
-            const patronesFecha = [
-                /^(?:qué|que) d[íi]a es hoy\??$/i,
-                /^(?:cu[áa]l es )?la fecha de hoy\??$/i,
-                /^(?:qué|que) fecha es(?: hoy)?\??$/i,
-                /^(?:me dices|me puedes decir) (?:la fecha|el d[íi]a)(?: de hoy)?\??$/i
-            ];
-            return patronesFecha.some(patron => patron.test(mensaje.trim()));
-        }
-        
-        async function handleUserInput() {
-            const userMessage = messageInput.value.trim();
-            if (userMessage !== '') {
-                agregarMensaje(userMessage, true);
-        
-                try {
-                    let botResponse;
-        
-                    if (isPreguntaHora(userMessage)) {
-                        botResponse = await getCurrentTime();
-                    } else if (isPreguntaFecha(userMessage)) {
-                        botResponse = await getCurrentDate();
-                    } else {
-                        const searchResult = await searchDuckDuckGo(userMessage);
-                        botResponse = await getChatCompletion(userMessage, searchResult);
-                    }
-        
-                    agregarMensaje(botResponse, false);
-                } catch (error) {
-                    console.error('Error al obtener respuesta del modelo:', error);
-                    agregarMensaje('Lo siento, hubo un error al procesar tu solicitud.', false);
-                }
-        
-                messageInput.value = '';
-            }
-        }
-        
-        async function searchDuckDuckGo(query) {
-            const response = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json`);
-            const data = await response.json();
-            return data.AbstractText || "No se encontró información relevante.";
-        }
-        
-        async function getCurrentTime() {
-            const response = await fetch('https://worldtimeapi.org/api/ip');
-            const data = await response.json();
-            return `La hora actual es ${data.datetime.slice(11, 19)}`;
-        }
-        
-        async function getCurrentDate() {
-            const response = await fetch('https://worldtimeapi.org/api/ip');
-            const data = await response.json();
-            return `La fecha actual es ${data.datetime.slice(0, 10)}`;
-        }
-        
-        async function getChatCompletion(userMessage, searchResult) {
-            const selectedModel = modelSelect.value;
-            const response = await inference.chatCompletion({
-                model: selectedModel,
-                messages: [...context, { role: "system", content: searchResult }],
-                max_tokens: 3072
-            });
-        
-            return response.choices[0].message.content;
-        }
-        
-        async function cambiarModelo() {
-            const nuevoModelo = modelSelect.value;
-            inference.model = nuevoModelo;
-        
-            // Limpiar mensajes antiguos y contexto
-            chatMessages.innerHTML = '';
-            context = [];
-        
-            // Mostrar saludo
-            agregarMensaje(`Modelo cambiado a: ${nuevoModelo}`, false); 
+    }).then((result) => {
+        if (result.isConfirmed) {
+            chatContainer.style.display = 'flex';
             agregarMensaje("¡Hola! Soy Gareth. ¿En qué puedo ayudarte hoy?", false);
+        } else {
+            Swal.fire(
+                'Acceso Denegado',
+                'Debes aceptar los Términos y Condiciones para usar el chatbot.',
+                'error'
+            );
+        }
+    });
+}
+
+function agregarMensaje(mensaje, isUser = false) {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message', isUser ? 'user-message' : 'bot-message');
+
+    mensaje = mensaje.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => 
+        `<div class="code-block" data-language="${lang || 'plaintext'}">
+            <pre><code class="language-${lang || 'plaintext'}">${code.trim()}</code></pre>
+        </div>`
+    );
+
+    messageElement.innerHTML = mensaje;
+    chatMessages.appendChild(messageElement);
+    scrollToBottom();
+    renderizarLaTeX(messageElement);
+    Prism.highlightAllUnder(messageElement);
+
+    context.push({ role: isUser ? "user" : "assistant", content: mensaje });
+
+    if (!isUser && textToSpeechToggle.checked) {
+        speechSynthesis.speak(new SpeechSynthesisUtterance(mensaje));
+    }
+}
+
+function renderizarLaTeX(elemento) {
+    const textoOriginal = elemento.innerHTML;
+    const regex = /(\$\$[\s\S]*?\$\$|\$[^\n$]*?\$)/g;
+    let resultado = '';
+    let ultimoIndice = 0;
+
+    textoOriginal.replace(regex, (match, formula, indice) => {
+        resultado += textoOriginal.slice(ultimoIndice, indice);
+
+        try {
+            const esDisplayMode = formula.startsWith('$$');
+            const formulaLimpia = formula.slice(esDisplayMode ? 2 : 1, -1 * (esDisplayMode ? 2 : 1));
+            const formulaRendered = katex.renderToString(formulaLimpia, {
+                displayMode: esDisplayMode,
+                throwOnError: false
+            });
+            resultado += formulaRendered;
+        } catch (error) {
+            console.error('Error al renderizar LaTeX:', error);
+            resultado += formula;
+        }
+
+        ultimoIndice = indice + formula.length;
+    });
+
+    resultado += textoOriginal.slice(ultimoIndice);
+    elemento.innerHTML = resultado;
+}
+
+function scrollToBottom() {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function isPreguntaHora(mensaje) {
+    const patronesHora = [
+        /^(?:qué|que) hora es\??$/i,
+        /^(?:me dices|me puedes decir) la hora\??$/i,
+        /^(?:sabes|sab[ée]s) (?:cu[áa]l es )?la hora(?: actual)?\??$/i,
+        /^d[íi]me la hora(?: por favor)?\??$/i
+    ];
+    return patronesHora.some(patron => patron.test(mensaje.trim()));
+}
+
+function isPreguntaFecha(mensaje) {
+    const patronesFecha = [
+        /^(?:qué|que) d[íi]a es hoy\??$/i,
+        /^(?:cu[áa]l es )?la fecha de hoy\??$/i,
+        /^(?:qué|que) fecha es(?: hoy)?\??$/i,
+        /^(?:me dices|me puedes decir) (?:la fecha|el d[íi]a)(?: de hoy)?\??$/i
+    ];
+    return patronesFecha.some(patron => patron.test(mensaje.trim()));
+}
+
+async function handleUserInput() {
+    const userMessage = messageInput.value.trim();
+    if (userMessage !== '') {
+        agregarMensaje(userMessage, true);
+        typingIndicator.style.display = 'block';
+
+        try {
+            let botResponse;
+
+            if (isPreguntaHora(userMessage)) {
+                botResponse = await getCurrentTime();
+            } else if (isPreguntaFecha(userMessage)) {
+                botResponse = await getCurrentDate();
+            } else {
+                let contextoCompleto = userMessage;
+                if (documentoContenido && (userMessage.toLowerCase().includes('documento') || userMessage.toLowerCase().includes('text'))) {
+                    contextoCompleto = `Contenido del documento: ${documentoContenido}\n\nPregunta del usuario: ${userMessage}`;
+                }
+
+                const searchResult = await searchDuckDuckGo(userMessage);
+                botResponse = await getChatCompletion(contextoCompleto, searchResult);
+            }
+
+            agregarMensaje(botResponse, false);
+        } catch (error) {
+            console.error('Error al obtener respuesta del modelo:', error);
+            agregarMensaje('Lo siento, hubo un error al procesar tu solicitud.', false);
+        } finally {
+            typingIndicator.style.display = 'none';
+        }
+
+        messageInput.value = '';
+    }
+}
+
+async function searchDuckDuckGo(query) {
+    const response = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json`);
+    const data = await response.json();
+    return data.AbstractText || "No se encontró información relevante.";
+}
+
+async function getCurrentTime() {
+    const response = await fetch('https://worldtimeapi.org/api/ip');
+    const data = await response.json();
+    return `La hora actual es ${data.datetime.slice(11, 19)}`;
+}
+
+async function getCurrentDate() {
+    const response = await fetch('https://worldtimeapi.org/api/ip');
+    const data = await response.json();
+    return `La fecha actual es ${data.datetime.slice(0, 10)}`;
+}
+
+async function getChatCompletion(userMessage, searchResult) {
+    const selectedModel = modelSelect.value;
+    const response = await inference.chatCompletion({
+        model: selectedModel,
+        messages: [
+            ...context, 
+            { role: "system", content: searchResult },
+            { role: "user", content: userMessage }
+        ],
+        max_tokens: 3072
+    });
+
+    return response.choices[0].message.content;
+}
+
+async function cambiarModelo() {
+    const nuevoModelo = modelSelect.value;
+    inference.model = nuevoModelo;
+
+    chatMessages.innerHTML = '';
+    context = [];
+
+    agregarMensaje(`Modelo cambiado a: ${nuevoModelo}`, false); 
+    agregarMensaje("¡Hola! Soy Gareth. ¿En qué puedo ayudarte hoy?", false);
+}
+
+async function leerDocumento(file) {
+    const arrayBuffer = await file.arrayBuffer();
+    const loadingTask = pdfjsLib.getDocument(arrayBuffer);
+    
+    try {
+        const pdf = await loadingTask.promise;
+        let textoCompleto = '';
+        
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(' ');
+            textoCompleto += pageText + ' ';
         }
         
-        function setupEventListeners() {
-            sendButton.addEventListener('click', handleUserInput);
-            messageInput.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter') {
-                    handleUserInput();
-                }
-            });
-            changeModelButton.addEventListener('click', cambiarModelo);
+        documentoContenido = textoCompleto;
+        agregarMensaje("Documento cargado con éxito. Puedes hacer preguntas sobre su contenido.", false);
+    } catch (error) {
+        console.error('Error al leer el PDF:', error);
+        agregarMensaje("Hubo un error al cargar el documento. Por favor, intenta con otro archivo.", false);
+    }
+}
+
+function mostrarAyuda() {
+    Swal.fire({
+        title: '¿Necesitas ayuda?',
+        html: `
+            <p>Aquí tienes algunas sugerencias para usar Gareth AI:</p>
+            <ul>
+                <li>Puedes preguntar sobre cualquier tema general.</li>
+                <li>Para cargar un documento PDF, usa el botón "Cargar Documento".</li>
+                <li>Puedes cambiar el modelo de IA usando el menú desplegable.</li>
+                <li>Activa el "Texto a voz" si quieres que Gareth lea sus respuestas.</li>
+                <li>Pregunta "¿Qué hora es?" o "¿Qué día es hoy?" para obtener la hora o fecha actual.</li>
+            </ul>
+        `,
+        icon: 'info',
+        confirmButtonText: 'Entendido'
+    });
+}
+
+function setupEventListeners() {
+    sendButton.addEventListener('click', handleUserInput);
+    messageInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            handleUserInput();
         }
-        
-        window.addEventListener('load', () => {
-            mostrarTerminosYCondiciones();
-            setupEventListeners();
-        
-            const themeSwitch = document.getElementById('theme-switch');
-            themeSwitch.addEventListener('change', (event) => {
-                if (event.target.checked) {
-                    document.body.classList.add('dark-mode');
-                } else {
-                    document.body.classList.remove('dark-mode');
-                }
-            });
-        });
-        </script>
+    });
+    changeModelButton.addEventListener('click', cambiarModelo);
+    uploadDocumentButton.addEventListener('click', () => {
+        const file = fileInput.files[0];
+        if (file) {
+            if (file.type === 'application/pdf') {
+                leerDocumento(file);
+            } else {
+                agregarMensaje("Por favor, selecciona un archivo PDF válido.", false);
+            }
+        } else {
+            agregarMensaje("Por favor, selecciona un archivo antes de intentar cargarlo.", false);
+        }
+    });
+    ayudaButton.addEventListener('click', mostrarAyuda);
+}
+
+window.addEventListener('load', () => {
+    mostrarTerminosYCondiciones();
+    setupEventListeners();
+
+    const themeSwitch = document.getElementById('theme-switch');
+    themeSwitch.addEventListener('change', (event) => {
+        if (event.target.checked) {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+    });
+});
+    </script>
 </body>
 </html>
