@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gareth AI</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.0/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.15.0/dist/katex.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
+    <script>
+        // Configurar el worker de PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js';
+    </script>
+    <style>
+        @import "css/style.css";
+      </style>
+</head>
+<body>
+    <!-- Contenedor principal -->
+    <div id="main-container">
+        <!-- Barra lateral -->
+        <div id="sidebar">
+            <p>Modelos Disponibles</p>
+            <select id="model-select">
+                <option value="01-ai/Yi-1.5-34B-Chat">GPT-4</option>
+                <option value="codellama/CodeLlama-34b-Instruct-hf">CodeLlama</option>
+                <option value="microsoft/Phi-3-mini-4k-instruct">Microsoft Phi-3</option>
+                <option value="mistralai/Mistral-Nemo-Instruct-2407">Mistral</option>
+                <option value="meta-llama/Meta-Llama-3-8B-Instruct">Llama 3</option>
+            </select>
+            <button id="change-model-button">Cambiar Modelo</button>
+            <button id="ayuda">¿Necesitas ayuda?</button>
+            <div id="text-to-speech-container">
+                <label for="text-to-speech-toggle">Texto a voz</label>
+                <input type="checkbox" id="text-to-speech-toggle">
+            </div>
+            <!-- Nuevo botón para cargar documentos -->
+             <div>
+                <div class="file-container">
+                    <p>Procesador de PDF (Beta)</p>
+                    <p>Peso Maximo (1MB)</p>
+                    <input type="file" id="file-input" class="custom-file-input">
+                    <label for="file-input" class="custom-file-label">Elegir archivo</label>
+                </div>        
+                <button id="upload-document-button">Cargar Documento</button>
+             </div>
+        </div>
+        <div id="chat-container">
+            <div id="chat-header">
+                Gareth AI
+                <div class="theme-toggle">
+                    <input type="checkbox" id="theme-switch" class="theme-switch">
+                    <label for="theme-switch" class="theme-label"></label>
+                </div>
+            </div>
+            <div id="chat-messages">
+                <!-- Mensaje de "Gareth está escribiendo..." -->
+                <div id="typing-indicator" style="display: none;">Gareth está escribiendo...</div>
+            </div>
+            <div id="user-input">
+                <input type="text" id="message-input" placeholder="Escribe tu mensaje...">
+                <button id="send-button">Enviar</button>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="/js/script.js"></script>
+</body>
+</html>
