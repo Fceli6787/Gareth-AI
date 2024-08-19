@@ -194,7 +194,7 @@ async function getChatCompletion(userMessage) {
     
     try {
         let response;
-        if (selectedModel === 'mistralai/Mistral-Nemo-Instruct-2407') {
+        if (selectedModel === 'mistralai/Mixtral-8x7B-Instruct-v0.1') {
             const systemPrompt = "Eres un asistente AI llamado Gareth. Responde de manera concisa y relevante a las preguntas del usuario.";
             const fullPrompt = `${systemPrompt}\n\nUsuario: ${userMessage}\nGareth:`;
             
