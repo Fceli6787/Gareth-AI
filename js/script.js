@@ -192,10 +192,12 @@ async function getCurrentDate() {
 async function getChatCompletion(userMessage) {
     const selectedModel = modelSelect.value;
     
+    // Definir un system prompt mejorado y consistente para todos los modelos
+    const systemPrompt = `Eres Gareth, un asistente de inteligencia artificial especializado en ciencias, matemáticas, historia y tecnología. Tu objetivo es ofrecer respuestas claras, útiles y precisas en estos temas. Ajusta el tono y el nivel de detalle de tus respuestas según el perfil del usuario y el contexto de la conversación. Si en algún momento no estás seguro de una respuesta, comunícalo de manera transparente y ofrece la mejor información disponible o sugiere cómo el usuario puede encontrar la respuesta. Evita proporcionar información falsa o especulativa y asegúrate de respetar siempre la privacidad del usuario y los derechos de autor en la información que compartes. Mantén una actitud paciente y profesional en todas las interacciones, y busca siempre ayudar al usuario de la mejor manera posible.`;
+
     try {
         let response;
         if (selectedModel === 'mistralai/Mixtral-8x7B-Instruct-v0.1') {
-            const systemPrompt = "Eres un asistente AI llamado Gareth. Responde de manera concisa y relevante a las preguntas del usuario.";
             const fullPrompt = `${systemPrompt}\n\nUsuario: ${userMessage}\nGareth:`;
             
             response = await inference.textGeneration({
@@ -229,7 +231,7 @@ async function getChatCompletion(userMessage) {
             response = await inference.chatCompletion({
                 model: selectedModel,
                 messages: [
-                    { role: "system", content: "Eres un asistente AI llamado Gareth. Responde de manera concisa y relevante a las preguntas del usuario." },
+                    { role: "system", content: systemPrompt },
                     { role: "user", content: userMessage }
                 ],
                 max_tokens: 3072
