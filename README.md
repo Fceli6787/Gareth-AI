@@ -1,7 +1,7 @@
 # Gareth-AI
 # Gareth AI: Chatbot con GPT-4
 
-Gareth AI es una aplicación web interactiva que ofrece un chatbot basado en el modelo de lenguaje GPT-4. Esta herramienta avanzada permite a los usuarios interactuar con un modelo de inteligencia artificial de última generación a través de una interfaz moderna y accesible.
+Gareth AI es una aplicación web interactiva que ofrece un chatbot basado en el modelo de lenguaje GPT-4 haciendo uso de tecnologia de HuggingFace. Esta herramienta avanzada permite a los usuarios interactuar con un modelo de inteligencia artificial de última generación a través de una interfaz moderna y accesible.
 
 ## Características
 
@@ -18,7 +18,7 @@ Gareth AI es una aplicación web interactiva que ofrece un chatbot basado en el 
 - **KaTeX**: Para la renderización de matemáticas en la interfaz.
 - **Prism**: Para resaltar la sintaxis en fragmentos de código.
 - **PDF.js**: Para procesar y visualizar archivos PDF en el navegador.
-- 
+- **HuggingFace**: Libreria de Modelos IA basados de Open-Source.
 ## Uso
 
 1. **Selecciona el Modelo**: Elige el modelo de IA que deseas usar desde el menú desplegable en la barra lateral.
