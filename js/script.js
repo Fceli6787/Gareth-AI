@@ -131,6 +131,20 @@ function isPreguntaFecha(mensaje) {
     return patronesFecha.some(patron => patron.test(mensaje.trim()));
 }
 
+function cleanYiModelResponse(response) {
+    // Eliminar las etiquetas especiales y palabras clave
+    let cleanedResponse = response.replace(/<\|im_start\|>|<\|im_end\|>/g, '');
+    cleanedResponse = cleanedResponse.replace(/\buser\b|\bassistant\b/g, '');
+    
+    // Eliminar espacios en blanco extra y líneas vacías
+    cleanedResponse = cleanedResponse.split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+        .join('\n');
+    
+    return cleanedResponse.trim();
+}
+
 async function handleUserInput() {
     const userMessage = messageInput.value.trim();
     if (userMessage !== '') {
@@ -191,58 +205,81 @@ async function getCurrentDate() {
 
 async function getChatCompletion(userMessage) {
     const selectedModel = modelSelect.value;
-    
-    // Definir un system prompt mejorado y consistente para todos los modelos
-    const systemPrompt = `Eres Gareth, un asistente de inteligencia artificial especializado en ciencias, matemáticas, historia y tecnología. Tu objetivo es ofrecer respuestas claras, útiles y precisas en estos temas. Ajusta el tono y el nivel de detalle de tus respuestas según el perfil del usuario y el contexto de la conversación. Si en algún momento no estás seguro de una respuesta, comunícalo de manera transparente y ofrece la mejor información disponible o sugiere cómo el usuario puede encontrar la respuesta. Evita proporcionar información falsa o especulativa y asegúrate de respetar siempre la privacidad del usuario y los derechos de autor en la información que compartes. Mantén una actitud paciente y profesional en todas las interacciones, y busca siempre ayudar al usuario de la mejor manera posible.`;
-
+  
+    const systemPrompt = `Eres Gareth, un asistente de inteligencia artificial especializado en ciencias, matemáticas, historia y tecnología, con el objetivo de ofrecer respuestas claras, útiles y precisas en estos temas, ajustando el tono y el nivel de detalle según el perfil del usuario y el contexto, manteniendo una actitud paciente y profesional, siendo transparente al expresar incertidumbre, evitando información falsa o especulativa, respetando la privacidad del usuario y los derechos de autor, y siendo breve en consultas generales pero detallado en consultas importantes como matemáticas, ingeniería, ciencias, etc.`;
+  
     try {
-        let response;
-        if (selectedModel === 'mistralai/Mixtral-8x7B-Instruct-v0.1') {
-            const fullPrompt = `${systemPrompt}\n\nUsuario: ${userMessage}\nGareth:`;
-            
-            response = await inference.textGeneration({
-                model: selectedModel,
-                inputs: fullPrompt,
-                parameters: {
-                    max_new_tokens: 3072,
-                    temperature: 0.7,
-                    top_p: 0.95,
-                    return_full_text: false
-                }
-            });
-            
-            // Filtrar la respuesta para obtener solo la parte relevante
-            let cleanedResponse = response.generated_text.trim();
-            
-            // Eliminar cualquier texto antes de "Gareth:" si está presente
-            const garethIndex = cleanedResponse.lastIndexOf("Gareth:");
-            if (garethIndex !== -1) {
-                cleanedResponse = cleanedResponse.substring(garethIndex + 7).trim();
-            }
-            
-            // Eliminar cualquier texto después de "Usuario:" si está presente
-            const usuarioIndex = cleanedResponse.indexOf("Usuario:");
-            if (usuarioIndex !== -1) {
-                cleanedResponse = cleanedResponse.substring(0, usuarioIndex).trim();
-            }
-            
-            return cleanedResponse;
-        } else {
-            response = await inference.chatCompletion({
-                model: selectedModel,
-                messages: [
-                    { role: "system", content: systemPrompt },
-                    { role: "user", content: userMessage }
-                ],
-                max_tokens: 3072
-            });
-            return response.choices[0].message.content;
+      let response;
+      if (selectedModel === 'mistralai/Mixtral-8x7B-Instruct-v0.1') {
+        const fullPrompt = `${systemPrompt}\n\nUsuario: ${userMessage}\nGareth:`;
+  
+        response = await inference.textGeneration({
+          model: selectedModel,
+          inputs: fullPrompt,
+          parameters: {
+            max_new_tokens: 3072,
+            temperature: 0.7,
+            top_p: 0.95,
+            return_full_text: false
+          }
+        });
+  
+        let cleanedResponse = response.generated_text.trim();
+  
+        const garethIndex = cleanedResponse.lastIndexOf("Gareth:");
+        if (garethIndex !== -1) {
+          cleanedResponse = cleanedResponse.substring(garethIndex + 7).trim();
         }
+  
+        const usuarioIndex = cleanedResponse.indexOf("Usuario:");
+        if (usuarioIndex !== -1) {
+          cleanedResponse = cleanedResponse.substring(0, usuarioIndex).trim();
+        }
+  
+        return cleanedResponse;
+  
+      } else if (selectedModel === 'google/gemma-1.1-7b-it') {
+        // Lógica para google/gemma-1.1-7b-it
+        const fullPrompt = `${systemPrompt}\n\nUsuario: ${userMessage}\nGareth:`;
+  
+        response = await inference.textGeneration({
+          model: selectedModel,
+          inputs: fullPrompt,
+          parameters: {
+            max_new_tokens: 3072,
+            temperature: 0.7,
+            top_p: 0.95,
+            return_full_text: false
+          }
+        });
+  
+        // Ajusta la limpieza de la respuesta según sea necesario
+        let cleanedResponse = response.generated_text.trim();
+        return cleanedResponse;
+  
+      } else {
+        response = await inference.chatCompletion({
+          model: selectedModel,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userMessage }
+          ],
+          max_tokens: 3072
+        });
+        let botResponse = response.choices[0].message.content;
+  
+        // Aplicar limpieza solo para el modelo Yi-1.5-34B-Chat
+        if (selectedModel === '01-ai/Yi-1.5-34B-Chat') {
+          botResponse = cleanYiModelResponse(botResponse);
+        }
+  
+        return botResponse;
+      }
     } catch (error) {
-        console.error("Error al usar el modelo:", error.message);
-        return "Lo siento, hubo un error al procesar tu solicitud. Por favor, intenta de nuevo.";
+      console.error("Error al usar el modelo:", error.message);
+      return "Lo siento, hubo un error al procesar tu solicitud. Por favor, intenta de nuevo.";
     }
-}
+  }
 
 async function cambiarModelo() {
     const nuevoModelo = modelSelect.value;
