@@ -21,10 +21,20 @@ function mostrarTerminosYCondiciones() {
     Swal.fire({
         title: 'Términos y Condiciones',
         html: `
-            <p>Aceptas los términos y condiciones de este bot.</p>
-            <p>Que usa tecnología de empresas como Meta, OpenAI y Mistral AI los cuales impulsan el chat</p>
-            <p>El contenido generado puede ser inexacto o falso en algunos casos
-               por eso se requiere verificar con una segunda respuesta</p>
+<p>Aceptas los términos y condiciones de este bot.</p>
+<p>Que usa tecnología de empresas como Meta, OpenAI y Mistral AI, que impulsan el chat mediante modelos de lenguaje grandes como Meta Llama 3, Yi-1.5-34B-Chat, Mistral-8x7B-Instruct-v0.1, entre otros. Estos modelos están disponibles en Hugging Face y están sujetos a las condiciones de uso de cada proveedor.</p>
+<p>El contenido generado puede ser inexacto o falso en algunos casos, por eso se requiere verificar con una segunda fuente antes de tomar cualquier decisión o acción.</p>
+<p>Los modelos de lenguaje utilizados en este bot están sujetos a las condiciones de uso de cada proveedor. En particular:</p>
+<ul>
+<li>El modelo Meta Llama 3 está sujeto a la licencia de la comunidad de Meta Llama 3, que se puede encontrar en <a href="https://llama.meta.com/llama-downloads</a>.</li" target="_blank" rel="noreferrer">https://llama.meta.com/llama-downloads"</a>.</li>
+<li>El modelo Yi-1.5-34B-Chat está sujeto a la licencia de la comunidad de Yi Series Models, que se puede encontrar en <a href="https://github.com/01-ai/Yi-Series-Models-Community-License-Agreement</a>.</li" target="_blank" rel="noreferrer">https://github.com/01-ai/Yi-Series-Models-Community-License-Agreement"</a>.</li>
+<li>El modelo Mistral-8x7B-Instruct-v0.1 está sujeto a la licencia de la comunidad de Mistral AI, que se puede encontrar en <a href="https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1</a>.</li" target="_blank" rel="noreferrer">https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1"</a>.</li>
+<li>El modelo Gemma-1.1-7b-it está sujeto a la licencia de la comunidad de Google, que se puede encontrar en <a href="https://huggingface.co/google/gemma-1.1-7b-it</a>.</li" target="_blank" rel="noreferrer">https://huggingface.co/google/gemma-1.1-7b-it"</a>.</li>
+<li>El modelo CodeLlama-34b-Instruct-hf está sujeto a la licencia de la comunidad de Meta AI, que se puede encontrar en <a href="https://huggingface.co/codellama/CodeLlama-34b-Instruct-hf</a>.</li" target="_blank" rel="noreferrer">https://huggingface.co/codellama/CodeLlama-34b-Instruct-hf"</a>.</li>
+<li>El modelo Phi-3-mini-4k-instruct está sujeto a la licencia de la comunidad de Microsoft, que se puede encontrar en <a href="https://huggingface.co/microsoft/Phi-3-mini-4k-instruct</a>.</li" target="_blank" rel="noreferrer">https://huggingface.co/microsoft/Phi-3-mini-4k-instruct"</a>.</li>
+</ul>
+<p>Si utilizas este bot para generar contenido, te pedimos que cites y reconozcas a los autores de los modelos de lenguaje utilizados. Puedes encontrar información sobre cómo citar los modelos en las páginas de documentación de cada proveedor.</p>
+<p>No garantizamos que el contenido generado por este bot sea correcto o razonable en todos los casos. Aunque hemos tomado medidas para asegurarnos de que los modelos de lenguaje sean lo más precisos posible, todavía existe el riesgo de que se generen contenidos problemáticos. Utiliza este bot bajo tu propia responsabilidad.</p>
         `,
         icon: 'info',
         showCancelButton: true,
@@ -134,7 +144,11 @@ function isPreguntaFecha(mensaje) {
 function cleanYiModelResponse(response) {
     // Eliminar las etiquetas especiales y palabras clave
     let cleanedResponse = response.replace(/<\|im_start\|>|<\|im_end\|>/g, '');
-    cleanedResponse = cleanedResponse.replace(/\buser\b|\bassistant\b/g, '');
+    
+    // Eliminar "Usuario:", "Gareth:", "user", y "assistant" al principio de cada línea
+    cleanedResponse = cleanedResponse.split('\n')
+        .map(line => line.replace(/^(user:|assistant:)\s*/i, ''))
+        .join('\n');
     
     // Eliminar espacios en blanco extra y líneas vacías
     cleanedResponse = cleanedResponse.split('\n')
@@ -203,83 +217,104 @@ async function getCurrentDate() {
     return `La fecha actual es ${data.datetime.slice(0, 10)}`;
 }
 
-async function getChatCompletion(userMessage) {
+async function getChatCompletion(userMessage, searchResult) {
     const selectedModel = modelSelect.value;
   
     const systemPrompt = `Eres Gareth, un asistente de inteligencia artificial especializado en ciencias, matemáticas, historia y tecnología, con el objetivo de ofrecer respuestas claras, útiles y precisas en estos temas, ajustando el tono y el nivel de detalle según el perfil del usuario y el contexto, manteniendo una actitud paciente y profesional, siendo transparente al expresar incertidumbre, evitando información falsa o especulativa, respetando la privacidad del usuario y los derechos de autor, y siendo breve en consultas generales pero detallado en consultas importantes como matemáticas, ingeniería, ciencias, etc.`;
-  
+    const PromptGPT4 = `Eres Gareth, un asistente de inteligencia artificial desarrollado por 01-ai, posicionado en segundo lugar tras GPT-4 Turbo en pruebas comparativas en enero de 2024, especializado en ciencias, matemáticas, historia y tecnología, con el objetivo de ofrecer respuestas claras, útiles y precisas en estos temas, ajustando el tono y el nivel de detalle según el perfil del usuario y el contexto, manteniendo una actitud paciente y profesional, siendo transparente al expresar incertidumbre, evitando información falsa o especulativa, respetando la privacidad del usuario y los derechos de autor, y siendo breve en consultas generales pero detallado en consultas importantes como matemáticas, ingeniería, ciencias, etc.`
+
     try {
-      let response;
-      if (selectedModel === 'mistralai/Mixtral-8x7B-Instruct-v0.1') {
-        const fullPrompt = `${systemPrompt}\n\nUsuario: ${userMessage}\nGareth:`;
-  
-        response = await inference.textGeneration({
-          model: selectedModel,
-          inputs: fullPrompt,
-          parameters: {
-            max_new_tokens: 3072,
-            temperature: 0.7,
-            top_p: 0.95,
-            return_full_text: false
-          }
-        });
-  
-        let cleanedResponse = response.generated_text.trim();
-  
-        const garethIndex = cleanedResponse.lastIndexOf("Gareth:");
-        if (garethIndex !== -1) {
-          cleanedResponse = cleanedResponse.substring(garethIndex + 7).trim();
+        let response;
+        if (selectedModel === 'mistralai/Mixtral-8x7B-Instruct-v0.1') {
+            const fullPrompt = `${systemPrompt}\n\nUsuario: ${userMessage}\nGareth:`;
+
+            response = await inference.textGeneration({
+                model: selectedModel,
+                inputs: fullPrompt,
+                parameters: {
+                    max_new_tokens: 3072,
+                    temperature: 0.7,
+                    top_p: 0.95,
+                    return_full_text: false
+                }
+            });
+
+            let cleanedResponse = response.generated_text.trim();
+
+            const garethIndex = cleanedResponse.lastIndexOf("Gareth:");
+            if (garethIndex !== -1) {
+                cleanedResponse = cleanedResponse.substring(garethIndex + 7).trim();
+            }
+
+            const usuarioIndex = cleanedResponse.indexOf("Usuario:");
+            if (usuarioIndex !== -1) {
+                cleanedResponse = cleanedResponse.substring(0, usuarioIndex).trim();
+            }
+
+            return cleanedResponse;
+
+        } else if (selectedModel === 'google/gemma-1.1-7b-it') {
+            // Lógica para google/gemma-1.1-7b-it
+            const fullPrompt = `${systemPrompt}\n\nUsuario: ${userMessage}\nGareth:`;
+
+            response = await inference.textGeneration({
+                model: selectedModel,
+                inputs: fullPrompt,
+                parameters: {
+                    max_new_tokens: 3072,
+                    temperature: 0.7,
+                    top_p: 0.95,
+                    return_full_text: false
+                }
+            });
+
+            // Ajusta la limpieza de la respuesta según sea necesario
+            let cleanedResponse = response.generated_text.trim();
+            return cleanedResponse;
+
+        } else if (selectedModel === '01-ai/Yi-1.5-34B-Chat') {
+            // Lógica para 01-ai/Yi-1.5-34B-Chat
+            
+            // Construir el prompt completo asegurando que PromptGPT4 se integre correctamente
+            const fullPrompt = `${PromptGPT4}\n\nUsuario: ${userMessage}\nGareth:`;
+        
+            // Generar la respuesta usando el modelo seleccionado con parámetros ajustados
+            response = await inference.textGeneration({
+                model: selectedModel,
+                inputs: fullPrompt,
+                parameters: {
+                    max_tokens: 3072,  // Reducir los tokens máximos a un número más manejable
+                    top_p: 0.9,       // Ajustar top_p para un balance entre coherencia y creatividad
+                    temperature: 0.7, // Añadir temperatura para controlar la creatividad
+                    stop: ["\n", "Usuario:", "Gareth:"], // Añadir secuencias de parada para finalizar respuestas adecuadamente
+                    return_full_text: false
+                }
+            });
+
+            let botResponse = response.generated_text.trim();
+            botResponse = cleanYiModelResponse(botResponse);
+            
+            // Eliminar cualquier prefijo restante antes de la respuesta real
+            botResponse = botResponse.replace(/^[^:]*:\s*/, '');
+            
+            return botResponse;
+
+        } else {
+            response = await inference.chatCompletion({
+                model: selectedModel,
+                messages: [
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: userMessage }
+                ],
+                max_tokens: 3072
+            });
+            return response.choices[0].message.content;
         }
-  
-        const usuarioIndex = cleanedResponse.indexOf("Usuario:");
-        if (usuarioIndex !== -1) {
-          cleanedResponse = cleanedResponse.substring(0, usuarioIndex).trim();
-        }
-  
-        return cleanedResponse;
-  
-      } else if (selectedModel === 'google/gemma-1.1-7b-it') {
-        // Lógica para google/gemma-1.1-7b-it
-        const fullPrompt = `${systemPrompt}\n\nUsuario: ${userMessage}\nGareth:`;
-  
-        response = await inference.textGeneration({
-          model: selectedModel,
-          inputs: fullPrompt,
-          parameters: {
-            max_new_tokens: 3072,
-            temperature: 0.7,
-            top_p: 0.95,
-            return_full_text: false
-          }
-        });
-  
-        // Ajusta la limpieza de la respuesta según sea necesario
-        let cleanedResponse = response.generated_text.trim();
-        return cleanedResponse;
-  
-      } else {
-        response = await inference.chatCompletion({
-          model: selectedModel,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userMessage }
-          ],
-          max_tokens: 3072
-        });
-        let botResponse = response.choices[0].message.content;
-  
-        // Aplicar limpieza solo para el modelo Yi-1.5-34B-Chat
-        if (selectedModel === '01-ai/Yi-1.5-34B-Chat') {
-          botResponse = cleanYiModelResponse(botResponse);
-        }
-  
-        return botResponse;
-      }
     } catch (error) {
-      console.error("Error al usar el modelo:", error.message);
-      return "Lo siento, hubo un error al procesar tu solicitud. Por favor, intenta de nuevo.";
+        console.error("Error al usar el modelo:", error.message);
+        return "Lo siento, hubo un error al procesar tu solicitud. Por favor, intenta de nuevo.";
     }
-  }
+}
 
 async function cambiarModelo() {
     const nuevoModelo = modelSelect.value;
