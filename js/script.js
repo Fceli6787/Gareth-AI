@@ -284,10 +284,7 @@ async function getChatCompletion(userMessage, searchResult) {
                 inputs: fullPrompt,
                 parameters: {
                     max_tokens: 3072,  // Reducir los tokens máximos a un número más manejable
-                    top_p: 0.9,       // Ajustar top_p para un balance entre coherencia y creatividad
-                    temperature: 0.7, // Añadir temperatura para controlar la creatividad
                     stop: ["\n", "Usuario:", "Gareth:"], // Añadir secuencias de parada para finalizar respuestas adecuadamente
-                    return_full_text: false
                 }
             });
 
