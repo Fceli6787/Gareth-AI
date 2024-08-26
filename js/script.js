@@ -68,25 +68,23 @@ function iniciarChat() {
 }
 
 function agregarMensaje(mensaje, isUser = false) {
-    if (!isUser) { // Solo agregar mensajes del bot
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message', 'bot-message');
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message', isUser ? 'user-message' : 'bot-message');
 
-        mensaje = mensaje.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => `
-            <div class="code-block" data-language="${lang || 'plaintext'}">
-                <pre><code class="language-${lang || 'plaintext'}">${code.trim()}</code></pre>
-            </div>
-        `);
+    mensaje = mensaje.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => `
+        <div class="code-block" data-language="${lang || 'plaintext'}">
+            <pre><code class="language-${lang || 'plaintext'}">${code.trim()}</code></pre>
+        </div>
+    `);
 
-        messageElement.innerHTML = mensaje;
-        chatMessages.appendChild(messageElement);
-        scrollToBottom();
-        renderizarLaTeX(messageElement);
-        Prism.highlightAllUnder(messageElement);
+    messageElement.innerHTML = mensaje;
+    chatMessages.appendChild(messageElement);
+    scrollToBottom();
+    renderizarLaTeX(messageElement);
+    Prism.highlightAllUnder(messageElement);
 
-        if (!isUser && textToSpeechToggle.checked) {
-            speechSynthesis.speak(new SpeechSynthesisUtterance(mensaje));
-        }
+    if (!isUser && textToSpeechToggle.checked) {
+        speechSynthesis.speak(new SpeechSynthesisUtterance(mensaje));
     }
 }
 
@@ -144,11 +142,12 @@ function isPreguntaFecha(mensaje) {
 }
 
 function cleanYiModelResponse(response) {
+    // Eliminar las etiquetas especiales y palabras clave
     let cleanedResponse = response.replace(/<\|im_start\|>|<\|im_end\|>/g, '');
     
-    // Eliminar prefijos al principio de cada línea
+    // Eliminar "Usuario:", "Gareth:", "user", y "assistant" al principio de cada línea
     cleanedResponse = cleanedResponse.split('\n')
-        .map(line => line.replace(/^(Usuario:|Gareth:|user:|assistant:)\s*/i, ''))
+        .map(line => line.replace(/^(user:|assistant:)\s*/i, ''))
         .join('\n');
     
     // Eliminar espacios en blanco extra y líneas vacías
@@ -156,17 +155,14 @@ function cleanYiModelResponse(response) {
         .map(line => line.trim())
         .filter(line => line.length > 0)
         .join('\n');
-
-    // Eliminar la pregunta del usuario (más robusto)
-    cleanedResponse = cleanedResponse.replace(/Usuario:.*?\nGareth: /is, "Gareth: ");
-
+    
     return cleanedResponse.trim();
 }
 
 async function handleUserInput() {
     const userMessage = messageInput.value.trim();
     if (userMessage !== '') {
-        // agregarMensaje(userMessage, true);  <-- Eliminar esta línea para ocultar la pregunta
+        agregarMensaje(userMessage, true);
         typingIndicator.style.display = 'block';
 
         try {
@@ -279,20 +275,27 @@ async function getChatCompletion(userMessage, searchResult) {
         } else if (selectedModel === '01-ai/Yi-1.5-34B-Chat') {
             // Lógica para 01-ai/Yi-1.5-34B-Chat
             
+            // Construir el prompt completo asegurando que PromptGPT4 se integre correctamente
             const fullPrompt = `${PromptGPT4}\n\nUsuario: ${userMessage}\nGareth:`;
         
+            // Generar la respuesta usando el modelo seleccionado con parámetros ajustados
             response = await inference.textGeneration({
                 model: selectedModel,
                 inputs: fullPrompt,
                 parameters: {
-                    max_tokens: 3072, 
-                    top_p: 0.95,
-                    stop: ["\n", "Usuario:", "Gareth:", "<|im_end|>"], 
+                    max_tokens: 3072,  // Reducir los tokens máximos a un número más manejable
+                    top_p: 0.9,       // Ajustar top_p para un balance entre coherencia y creatividad
+                    temperature: 0.7, // Añadir temperatura para controlar la creatividad
+                    stop: ["\n", "Usuario:", "Gareth:"], // Añadir secuencias de parada para finalizar respuestas adecuadamente
+                    return_full_text: false
                 }
             });
 
             let botResponse = response.generated_text.trim();
             botResponse = cleanYiModelResponse(botResponse);
+            
+            // Eliminar cualquier prefijo restante antes de la respuesta real
+            botResponse = botResponse.replace(/^[^:]*:\s*/, '');
             
             return botResponse;
 
