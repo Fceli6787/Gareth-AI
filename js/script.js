@@ -253,8 +253,8 @@ async function getChatCompletion(userMessage, searchResult) {
 
             return cleanedResponse;
 
-        } else if (selectedModel === 'google/gemma-1.1-7b-it') {
-            // Lógica para google/gemma-1.1-7b-it
+        } else if (selectedModel === 'google/gemma-2-27b-it') {
+            // Lógica para google/gemma-2-27b-it
             const fullPrompt = `${systemPrompt}\n\nUsuario: ${userMessage}\nGareth:`;
 
             response = await inference.textGeneration({
