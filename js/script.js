@@ -221,7 +221,6 @@ async function getChatCompletion(userMessage, searchResult) {
     const selectedModel = modelSelect.value;
   
     const systemPrompt = `Eres Gareth, un asistente de inteligencia artificial especializado en ciencias, matemáticas, historia y tecnología, con el objetivo de ofrecer respuestas claras, útiles y precisas en estos temas, ajustando el tono y el nivel de detalle según el perfil del usuario y el contexto, manteniendo una actitud paciente y profesional, siendo transparente al expresar incertidumbre, evitando información falsa o especulativa, respetando la privacidad del usuario y los derechos de autor, y siendo breve en consultas generales pero detallado en consultas importantes como matemáticas, ingeniería, ciencias, etc.`;
-    const PromptGPT4 = `Eres Gareth, un asistente de inteligencia artificial desarrollado por 01-ai, posicionado en segundo lugar tras GPT-4 Turbo en pruebas comparativas en enero de 2024, especializado en ciencias, matemáticas, historia y tecnología, con el objetivo de ofrecer respuestas claras, útiles y precisas en estos temas, ajustando el tono y el nivel de detalle según el perfil del usuario y el contexto, manteniendo una actitud paciente y profesional, siendo transparente al expresar incertidumbre, evitando información falsa o especulativa, respetando la privacidad del usuario y los derechos de autor, y siendo breve en consultas generales pero detallado en consultas importantes como matemáticas, ingeniería, ciencias, etc.`
 
     try {
         let response;
@@ -273,10 +272,7 @@ async function getChatCompletion(userMessage, searchResult) {
             return cleanedResponse;
 
         } else if (selectedModel === '01-ai/Yi-1.5-34B-Chat') {
-            // Lógica para 01-ai/Yi-1.5-34B-Chat
-            
-            // Construir el prompt completo asegurando que PromptGPT4 se integre correctamente
-            const fullPrompt = `${PromptGPT4}\n\nUsuario: ${userMessage}\nGareth:`;
+            const fullPrompt = `${systemPrompt}\n\nUsuario: ${userMessage}\nGareth:`;
         
             // Generar la respuesta usando el modelo seleccionado con parámetros ajustados
             response = await inference.textGeneration({
@@ -284,7 +280,7 @@ async function getChatCompletion(userMessage, searchResult) {
                 inputs: fullPrompt,
                 parameters: {
                     max_tokens: 3072,  // Reducir los tokens máximos a un número más manejable       // Ajustar top_p para un balance entre coherencia y creatividad
-                    temperature: 0.5, // Añadir temperatura para controlar la creatividad
+                    temperature: 0.7, // Añadir temperatura para controlar la creatividad
                     stop: ["\n", "Usuario:", "Gareth:"], // Añadir secuencias de parada para finalizar respuestas adecuadamente
                     return_full_text: false
                 }
