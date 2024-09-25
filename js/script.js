@@ -270,30 +270,6 @@ async function getChatCompletion(userMessage, searchResult) {
             // Ajusta la limpieza de la respuesta según sea necesario
             let cleanedResponse = response.generated_text.trim();
             return cleanedResponse;
-
-        } else if (selectedModel === '01-ai/Yi-1.5-34B-Chat') {
-            const fullPrompt = `${systemPrompt}\n\nUsuario: ${userMessage}\nGareth:`;
-        
-            // Generar la respuesta usando el modelo seleccionado con parámetros ajustados
-            response = await inference.textGeneration({
-                model: selectedModel,
-                inputs: fullPrompt,
-                parameters: {
-                    max_tokens: 3072,  // Reducir los tokens máximos a un número más manejable       // Ajustar top_p para un balance entre coherencia y creatividad
-                    temperature: 0.7, // Añadir temperatura para controlar la creatividad
-                    stop: ["\n", "Usuario:", "Gareth:"], // Añadir secuencias de parada para finalizar respuestas adecuadamente
-                    return_full_text: false
-                }
-            });
-
-            let botResponse = response.generated_text.trim();
-            botResponse = cleanYiModelResponse(botResponse);
-            
-            // Eliminar cualquier prefijo restante antes de la respuesta real
-            botResponse = botResponse.replace(/^[^:]*:\s*/, '');
-            
-            return botResponse;
-
         } else {
             response = await inference.chatCompletion({
                 model: selectedModel,
