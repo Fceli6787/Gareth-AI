@@ -224,15 +224,15 @@ async function getChatCompletion(userMessage, searchResult) {
 
     try {
         let response;
-        if (selectedModel === 'mistralai/Mixtral-8x7B-Instruct-v0.1') {
+        if (selectedModel === 'mistralai/Mistral-Small-Instruct-2409') {
             const fullPrompt = `${systemPrompt}\n\nUsuario: ${userMessage}\nGareth:`;
 
             response = await inference.textGeneration({
                 model: selectedModel,
                 inputs: fullPrompt,
                 parameters: {
-                    max_new_tokens: 3072,
-                    temperature: 0.7,
+                    max_new_tokens: 3098,
+                    temperature: 0.6,
                     top_p: 0.95,
                     return_full_text: false
                 }
