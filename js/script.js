@@ -29,7 +29,7 @@ function mostrarTerminosYCondiciones() {
 <li>El modelo Meta Llama 3 está sujeto a la licencia de la comunidad de Meta Llama 3, que se puede encontrar en <a href="https://llama.meta.com/llama-downloads</a>.</li" target="_blank" rel="noreferrer">https://llama.meta.com/llama-downloads"</a>.</li>
 <li>El modelo Yi-1.5-34B-Chat está sujeto a la licencia de la comunidad de Yi Series Models, que se puede encontrar en <a href="https://github.com/01-ai/Yi-Series-Models-Community-License-Agreement</a>.</li" target="_blank" rel="noreferrer">https://github.com/01-ai/Yi-Series-Models-Community-License-Agreement"</a>.</li>
 <li>El modelo Mistral-8x7B-Instruct-v0.1 está sujeto a la licencia de la comunidad de Mistral AI, que se puede encontrar en <a href="https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1</a>.</li" target="_blank" rel="noreferrer">https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1"</a>.</li>
-<li>El modelo Gemma-1.1-7b-it está sujeto a la licencia de la comunidad de Google, que se puede encontrar en <a href="https://huggingface.co/google/gemma-1.1-7b-it</a>.</li" target="_blank" rel="noreferrer">https://huggingface.co/google/gemma-1.1-7b-it"</a>.</li>
+<li>El modelo gemma-2-27b-it está sujeto a la licencia de la comunidad de Google, que se puede encontrar en <a href="https://huggingface.co/google/gemma-1.1-7b-it</a>.</li" target="_blank" rel="noreferrer">https://huggingface.co/google/gemma-1.1-7b-it"</a>.</li>
 <li>El modelo CodeLlama-34b-Instruct-hf está sujeto a la licencia de la comunidad de Meta AI, que se puede encontrar en <a href="https://huggingface.co/codellama/CodeLlama-34b-Instruct-hf</a>.</li" target="_blank" rel="noreferrer">https://huggingface.co/codellama/CodeLlama-34b-Instruct-hf"</a>.</li>
 <li>El modelo Phi-3-mini-4k-instruct está sujeto a la licencia de la comunidad de Microsoft, que se puede encontrar en <a href="https://huggingface.co/microsoft/Phi-3-mini-4k-instruct</a>.</li" target="_blank" rel="noreferrer">https://huggingface.co/microsoft/Phi-3-mini-4k-instruct"</a>.</li>
 </ul>
@@ -252,7 +252,7 @@ async function getChatCompletion(userMessage, searchResult) {
 
             return cleanedResponse;
 
-        } else if (selectedModel === 'google/gemma-2-2b-it') {
+        } else if (selectedModel === 'google/gemma-2-27b-it') {
             // Lógica para google/gemma-2-27b-it
             const fullPrompt = `${systemPrompt}\n\nUsuario: ${userMessage}\nGareth:`;
 
