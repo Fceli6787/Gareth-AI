@@ -597,3 +597,257 @@ body, html {
   transform: translateY(1px); /* Press effect */
   box-shadow: 0 2px 4px rgba(78, 204, 163, 0.2); /* Reduced shadow when pressed */
 }
+
+
+/* Media query completo para dispositivos móviles */
+@media screen and (max-width: 768px) {
+  body, html {
+      font-size: 14px;
+      overflow-x: hidden;
+  }
+
+  .container {
+      flex-direction: column;
+  }
+
+  .sidebar {
+      width: 100%;
+      height: auto;
+      position: static;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  .sidebar-content {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+  }
+
+  .sidebar-header {
+      font-size: 18px;
+      margin-bottom: 0;
+  }
+
+  .sidebar-menu {
+      display: flex;
+      flex-direction: row;
+  }
+
+  #new-conversation, #about {
+      width: auto;
+      padding: 8px 12px;
+      font-size: 12px;
+      margin: 0 5px;
+  }
+
+  .main-content {
+      margin-left: 0;
+      padding: 10px;
+      height: calc(100vh - 60px);
+  }
+
+  .top-bar {
+      flex-direction: column;
+      padding: 10px;
+      margin-bottom: 15px;
+  }
+
+  .chat-area {
+      max-height: calc(100vh - 150px);
+      padding: 5px;
+  }
+
+  .chat-bubble {
+      padding: 10px;
+      margin: 8px 0;
+      max-width: 85%;
+      font-size: 14px;
+  }
+
+  .chat-bubble.user {
+      align-self: flex-end;
+      background-color: #3db892;
+  }
+
+  .chat-bubble.bot {
+      align-self: flex-start;
+      background-color: #0c2d4d;
+  }
+
+  .input-area {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 10px;
+      background-color: rgba(15, 52, 96, 0.9);
+  }
+
+  .input-box {
+      font-size: 14px;
+      padding: 10px;
+      border-radius: 20px;
+  }
+
+  .sparkle-button {
+      font-size: 12px;
+      padding: 8px 12px;
+  }
+
+  .code-block {
+      font-size: 12px;
+      padding: 10px;
+      margin-top: 8px;
+      border-radius: 8px;
+  }
+
+  .code-header {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 8px;
+  }
+
+  .code-header .language {
+      font-size: 12px;
+      margin-bottom: 5px;
+  }
+
+  .code-header .copy-button {
+      font-size: 12px;
+      padding: 4px 8px;
+      margin-top: 5px;
+  }
+
+  .copy-button {
+      opacity: 1;
+      transform: none;
+  }
+
+  pre {
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+  }
+
+  /* Ajustes para mejorar la interactividad en táctil */
+  button, .input-box, .copy-button {
+      min-height: 44px;
+  }
+
+  /* Animaciones más sutiles para mejorar el rendimiento */
+  .chat-bubble, .sparkle-button, #new-conversation, #about {
+      transition: all 0.2s ease;
+  }
+
+  /* Ajustes para el efecto sparkle en botones */
+  .sparkle-button {
+      --active: 0;
+      font-size: 12px;
+      padding: 8px 12px;
+  }
+
+  .sparkle path {
+      animation-duration: 0.4s;
+  }
+
+  .spark {
+      --spark: 1.8s;
+  }
+
+  .backdrop {
+      --cut: 0.1em;
+  }
+
+  .particle-pen {
+      position: absolute;
+      width: 150%;
+      aspect-ratio: 1;
+  }
+
+  .particle {
+      width: calc(var(--size, 0.2) * 1rem);
+  }
+
+  /* Ajustes para orientación horizontal */
+  @media (orientation: landscape) {
+      .sidebar {
+          width: 200px;
+          height: 100vh;
+          position: fixed;
+      }
+
+      .main-content {
+          margin-left: 200px;
+          height: 100vh;
+      }
+
+      .chat-area {
+          max-height: calc(100vh - 120px);
+      }
+
+      .input-area {
+          left: 200px;
+          width: calc(100% - 200px);
+      }
+  }
+}
+
+/* Laptops (769px a 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .sidebar {
+      width: 240px;
+  }
+
+  .main-content {
+      margin-left: 240px;
+  }
+
+  .chat-bubble {
+      max-width: 70%;
+  }
+
+  #new-conversation, #about {
+      width: 200px;
+  }
+}
+
+/* Monitores grandes (más de 1024px) */
+@media screen and (min-width: 1025px) {
+  .sidebar {
+      width: 280px;
+  }
+
+  .main-content {
+      margin-left: 280px;
+  }
+
+  .chat-bubble {
+      max-width: 60%;
+  }
+
+  #new-conversation, #about {
+      width: 220px;
+  }
+}
+
+/* Ajustes adicionales para mejorar la responsividad */
+@media screen and (max-width: 768px) {
+  .top-bar {
+      flex-direction: column;
+      align-items: stretch;
+  }
+
+  .code-block {
+      font-size: 14px;
+  }
+
+  .code-header {
+      flex-direction: column;
+      align-items: stretch;
+  }
+
+  .code-header .copy-button {
+      margin-top: 10px;
+  }
+}
