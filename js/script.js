@@ -88,7 +88,7 @@ function agregarMensaje(mensaje, isUser = false) {
 
 async function getChatCompletion(userMessage) {
     const model = "Qwen/Qwen2.5-72B-Instruct";
-    const systemPrompt = "Eres Qwen, un asistente de inteligencia artificial. Desarrollado por Alibaba";
+    const systemPrompt = "Eres Gareth, un asistente de inteligencia artificial. Impulsado por Qwen, Desarrollado por Alibaba";
 
     const response = await inference.chatCompletion({
         model: model,
