@@ -26,12 +26,6 @@ async function handleUserInput() {
     }
 }
 
-function escapeHTML(html) {
-    const div = document.createElement('div');
-    div.innerText = html;
-    return div.innerHTML;
-}
-
 function agregarMensaje(mensaje, isUser = false) {
     const messageElement = document.createElement('div');
     messageElement.classList.add('chat-bubble');
@@ -40,23 +34,27 @@ function agregarMensaje(mensaje, isUser = false) {
     // Detectar bloques de código con la expresión regular
     const regex = /```(\w+)?\n([\s\S]*?)```/g;
     mensaje = mensaje.replace(regex, (match, lenguaje, codigo) => {
+        // Crear el contenedor del bloque de código
         const codeBlock = document.createElement('div');
         codeBlock.classList.add('code-block');
 
+        // Crear el encabezado con la etiqueta del lenguaje y el botón de copiar
         const codeHeader = document.createElement('div');
         codeHeader.classList.add('code-header');
         codeHeader.innerHTML = `<span class="language">${lenguaje || ''}</span><button class="copy-button">Copiar</button>`;
         codeBlock.appendChild(codeHeader);
 
+        // Agregar el código al bloque con Prism.js
         const codeElement = document.createElement('pre');
         const codeContent = document.createElement('code');
         codeContent.classList.add(`language-${lenguaje || ''}`);
-        codeContent.textContent = escapeHTML(codigo); // Escapar el código aquí
+        codeContent.textContent = codigo;
         codeElement.appendChild(codeContent);
         codeBlock.appendChild(codeElement);
 
-        // Evento para copiar el código
+        // Agregar evento al botón de copiar
         codeHeader.querySelector('.copy-button').addEventListener('click', () => {
+            console.log('Botón Copiar presionado'); // Log para verificar el clic
             navigator.clipboard.writeText(codigo)
                 .then(() => {
                     const button = codeHeader.querySelector('.copy-button');
@@ -67,15 +65,11 @@ function agregarMensaje(mensaje, isUser = false) {
                 })
                 .catch(err => {
                     console.error('Error al copiar el código: ', err);
-                    alert('No se pudo copiar el código. Intenta de nuevo.');
                 });
         });
 
-        return codeBlock.outerHTML;
+        return codeBlock.outerHTML; // Devolver el HTML del bloque de código
     });
-
-    // Escapar el HTML del mensaje para evitar que se renderice
-    mensaje = escapeHTML(mensaje);
 
     // Mensaje normal o con código ya formateado
     if (!isUser) {
