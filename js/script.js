@@ -44,8 +44,10 @@ function agregarMensaje(mensaje, isUser = false) {
     messageElement.classList.add(isUser ? 'user' : 'bot');
 
     // Detectar bloques de código con la expresión regular
-    const regex = /(\w+)?\n([\s\S]*?)/g;
-    mensaje = mensaje.replace(regex, (match, lenguaje, codigo) => {
+    const regex = /(```\w+\n[\s\S]*?\n```)/g;
+    mensaje = mensaje.replace(regex, (match) => {
+        const codigo = match.slice(4, -3).trim(); // Eliminar los delimitadores ``` para obtener solo el código
+
         // Crear el contenedor del bloque de código
         const codeBlock = document.createElement('div');
         codeBlock.classList.add('code-block');
@@ -53,14 +55,14 @@ function agregarMensaje(mensaje, isUser = false) {
         // Crear el encabezado con la etiqueta del lenguaje y el botón de copiar
         const codeHeader = document.createElement('div');
         codeHeader.classList.add('code-header');
-        codeHeader.innerHTML = `<span class="language">${lenguaje || ''}</span><button class="copy-button">Copiar</button>`;
+        codeHeader.innerHTML = `<span class="language">HTML</span><button class="copy-button">Copiar</button>`;
         codeBlock.appendChild(codeHeader);
 
-        // Agregar el código al bloque escapando caracteres HTML
+        // Agregar el código escapando caracteres HTML
         const codeElement = document.createElement('pre');
         const codeContent = document.createElement('code');
-        codeContent.classList.add(`language-${lenguaje || ''}`);
-        codeContent.textContent = escapeHtml(codigo); // Escapar HTML para no renderizarlo
+        codeContent.classList.add('language-html');
+        codeContent.textContent = escapeHtml(codigo); // Escapar HTML para evitar renderizado
         codeElement.appendChild(codeContent);
         codeBlock.appendChild(codeElement);
 
@@ -86,7 +88,7 @@ function agregarMensaje(mensaje, isUser = false) {
     if (!isUser) {
         mensaje = mensaje.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); 
     }
-    messageElement.innerHTML = isUser ? `<strong>Tú:</strong> ${mensaje}` : `<strong>Gareth:</strong> ${mensaje}`;
+    messageElement.innerHTML = isUser ? `<strong>Tú:</strong> ${escapeHtml(mensaje)}` : `<strong>Gareth:</strong> ${mensaje}`;
 
     chatMessages.appendChild(messageElement);
     chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -107,36 +109,6 @@ async function getChatCompletion(userMessage) {
     });
 
     return response.choices[0].message.content;
-}
-
-function renderizarLaTeX(elemento) {
-    const textoOriginal = elemento.innerHTML;
-    const regex = /(\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\]|\(\\[^\)]*?\)\)|\\\([^\)]*\\\))/g; 
-    let resultado = '';
-    let ultimoIndice = 0;
-
-    textoOriginal.replace(regex, (match, formula, indice) => {
-        resultado += textoOriginal.slice(ultimoIndice, indice);
-
-        try {
-            const esDisplayMode = formula.startsWith('\\[') || formula.startsWith('(\\[');
-            const formulaLimpia = formula.slice(esDisplayMode ? (formula.startsWith('(\\[') ? 3 : 2) : (formula.startsWith('\\(') ? 2 : 1), -1 * (esDisplayMode ? (formula.startsWith('(\\[') ? 3 : 2) : (formula.startsWith('\\(') ? 2 : 1)));
-
-            const formulaRendered = katex.renderToString(formulaLimpia, {
-                displayMode: esDisplayMode,
-                throwOnError: false
-            });
-            resultado += formulaRendered;
-        } catch (error) {
-            console.error('Error al renderizar LaTeX:', error);
-            resultado += formula;
-        }
-
-        ultimoIndice = indice + formula.length;
-    });
-
-    resultado += textoOriginal.slice(ultimoIndice);
-    elemento.innerHTML = resultado;
 }
 
 // Manejar clic en el botón "Nueva conversación"
