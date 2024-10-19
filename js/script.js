@@ -3,8 +3,8 @@ import { HfInference } from 'https://cdn.jsdelivr.net/npm/@huggingface/inference
 const inference = new HfInference("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");
 const chatMessages = document.getElementById('chat-messages');
 const messageInput = document.getElementById('message-input');
-const sendButton = document.getElementById('send-button'); 
-const inputArea = document.querySelector('.input-area'); 
+const sendButton = document.getElementById('send-button');
+const inputArea = document.querySelector('.input-area');
 const newConversationButton = document.getElementById('new-conversation');
 
 async function handleUserInput() {
@@ -12,7 +12,7 @@ async function handleUserInput() {
     if (userMessage !== '') {
         agregarMensaje(userMessage, true);
         messageInput.value = '';
-        inputArea.classList.add('loading'); 
+        inputArea.classList.add('loading');
 
         try {
             const botResponse = await getChatCompletion(userMessage);
@@ -29,7 +29,10 @@ async function handleUserInput() {
 function agregarMensaje(mensaje, isUser = false) {
     const messageElement = document.createElement('div');
     messageElement.classList.add('chat-bubble');
-    messageElement.classList.add(isUser ? 'user' : 'bot'); 
+    messageElement.classList.add(isUser ? 'user' : 'bot');
+
+    // Reemplazar ### por un estilo de encabezado
+    mensaje = mensaje.replace(/### (.+)/g, '<h3>$1</h3>');
 
     // Detectar bloques de código con la expresión regular
     const regex = /```(\w+)?\n([\s\S]*?)```/g;
@@ -44,7 +47,7 @@ function agregarMensaje(mensaje, isUser = false) {
         codeHeader.innerHTML = `<span class="language">${lenguaje || ''}</span><button class="copy-button">Copiar</button>`;
         codeBlock.appendChild(codeHeader);
 
-        // Agregar el código al bloque con Prism.js
+
         const codeElement = document.createElement('pre');
         const codeContent = document.createElement('code');
         codeContent.classList.add(`language-${lenguaje || ''}`);
@@ -52,43 +55,49 @@ function agregarMensaje(mensaje, isUser = false) {
         codeElement.appendChild(codeContent);
         codeBlock.appendChild(codeElement);
 
-        // Agregar evento al botón de copiar
-        codeHeader.querySelector('.copy-button').addEventListener('click', () => {
-            navigator.clipboard.writeText(codigo)
-                .then(() => {
-                    // Cambiar el texto del botón a "Copiado!"
-                    const button = codeHeader.querySelector('.copy-button');
-                    button.innerText = '¡Copiado!';
-                    setTimeout(() => {
-                        button.innerText = 'Copiar';
-                    }, 2000);
-                })
-                .catch(err => {
-                    console.error('Error al copiar el código: ', err);
-                });
-        });
-
-        return codeBlock.outerHTML; // Devolver el HTML del bloque de código
+        return codeBlock.outerHTML;
     });
 
-    // Mensaje normal o con código ya formateado
     if (!isUser) {
-        mensaje = mensaje.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); 
+        mensaje = mensaje.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     }
+
     messageElement.innerHTML = isUser ? `<strong>Tú:</strong> ${mensaje}` : `<strong>Gareth:</strong> ${mensaje}`;
 
-    if (!isUser && mensaje.includes('\\(')) { 
+    if (!isUser && mensaje.includes('\\(')) {
         renderizarLaTeX(messageElement);
     }
 
     chatMessages.appendChild(messageElement);
-    chatMessages.scrollTop = chatMessages.scrollHeight; 
-    Prism.highlightAll(); // Resaltar la sintaxis después de agregar el elemento al DOM
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    Prism.highlightAll();
+
+    // Agregar evento al botón de copiar después de insertar en el DOM
+    const codeBlocks = messageElement.querySelectorAll('.code-block');
+    codeBlocks.forEach(block => {
+        const copyButton = block.querySelector('.copy-button');
+        const codeElement = block.querySelector('code');
+
+        copyButton.addEventListener('click', async () => {
+            const codigoParaCopiar = codeElement.textContent;
+
+            try {
+                await navigator.permissions.query({ name: 'clipboard-write' });
+                await navigator.clipboard.writeText(codigoParaCopiar);
+                copyButton.innerText = '¡Copiado!';
+                setTimeout(() => copyButton.innerText = 'Copiar', 2000);
+            } catch (err) {
+                console.error('Error al copiar:', err);
+                alert('No se pudo copiar. Inténtalo de nuevo o copia manualmente.');
+            }
+        });
+    });
 }
+
 
 async function getChatCompletion(userMessage) {
     const model = "Qwen/Qwen2.5-72B-Instruct";
-    const systemPrompt = "Eres Qwen, un asistente de inteligencia artificial. Desarrollado por Alibaba";
+    const systemPrompt = "Eres Gareth, un asistente de inteligencia artificial. Basado en Qwen, Desarrollado por Alibaba";
 
     const response = await inference.chatCompletion({
         model: model,
@@ -96,7 +105,7 @@ async function getChatCompletion(userMessage) {
             { role: "system", content: systemPrompt },
             { role: "user", content: userMessage }
         ],
-        max_tokens: 16384 
+        max_tokens: 16384
     });
 
     return response.choices[0].message.content;
@@ -104,7 +113,7 @@ async function getChatCompletion(userMessage) {
 
 function renderizarLaTeX(elemento) {
     const textoOriginal = elemento.innerHTML;
-    const regex = /(\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\]|\(\\[^\)]*?\)\)|\\\([^\)]*\\\))/g; 
+    const regex = /(\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\]|\(\\[^\)]*?\)\)|\\\([^\)]*\\\))/g;
     let resultado = '';
     let ultimoIndice = 0;
 
@@ -132,16 +141,10 @@ function renderizarLaTeX(elemento) {
     elemento.innerHTML = resultado;
 }
 
-  // Manejar clic en el botón "Nueva conversación"
-  newConversationButton.addEventListener('click', () => {
-      console.log("Nueva conversación");
-      
-      // Aquí puedes agregar el código para limpiar el área de chat
-      // y reiniciar la conversación.
-
-      // Recargar la página
-      location.reload();
-  });
+newConversationButton.addEventListener('click', () => {
+    console.log("Nueva conversación");
+    location.reload();
+});
 
 sendButton.addEventListener('click', handleUserInput);
 messageInput.addEventListener('keydown', (event) => {
@@ -150,23 +153,25 @@ messageInput.addEventListener('keydown', (event) => {
     }
 });
 
+
 function adjustChatAreaPadding() {
-const inputArea = document.querySelector('.input-area');
-const chatArea = document.querySelector('.chat-area');
+    const inputArea = document.querySelector('.input-area');
+    const chatArea = document.querySelector('.chat-area');
 
-if (inputArea && chatArea) { // Verificar que ambos elementos existan
-const inputAreaHeight = inputArea.offsetHeight;
-chatArea.style.paddingBottom = inputAreaHeight + 10 + 'px'; // Agregar 10px extra para mayor espacio
-}
+    if (inputArea && chatArea) {
+        const inputAreaHeight = inputArea.offsetHeight;
+        chatArea.style.paddingBottom = inputAreaHeight + 10 + 'px';
+    }
 }
 
-// Llamar la función al cargar la página y al redimensionar la ventana
 window.addEventListener('load', adjustChatAreaPadding);
 window.addEventListener('resize', adjustChatAreaPadding);
 
-// Optimización: usar un MutationObserver para detectar cambios en el DOM
+
 const observer = new MutationObserver(adjustChatAreaPadding);
 observer.observe(document.body, { childList: true, subtree: true });
+
+
 
 document.getElementById('about').addEventListener('click', function() {
     Swal.fire({
@@ -176,6 +181,6 @@ document.getElementById('about').addEventListener('click', function() {
         confirmButtonText: 'Aceptar',
         width: '600px',
         padding: '1em',
-        backdrop: 'rgba(0,0,123,0.4)' // Puedes ajustar el color de fondo
+        backdrop: 'rgba(0,0,123,0.4)'
     });
 });
