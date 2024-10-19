@@ -32,7 +32,9 @@ function agregarMensaje(mensaje, isUser = false) {
     messageElement.classList.add(isUser ? 'user' : 'bot'); 
 
     // Detectar bloques de código con la expresión regular
-    const regex = /```(\w+)?\n([\s\S]*?)```/g;
+    const regex = /
+(\w+)?\n([\s\S]*?)
+/g;
     mensaje = mensaje.replace(regex, (match, lenguaje, codigo) => {
         // Crear el contenedor del bloque de código
         const codeBlock = document.createElement('div');
@@ -41,22 +43,22 @@ function agregarMensaje(mensaje, isUser = false) {
         // Crear el encabezado con la etiqueta del lenguaje y el botón de copiar
         const codeHeader = document.createElement('div');
         codeHeader.classList.add('code-header');
-        codeHeader.innerHTML = `<span class="language">${lenguaje || ''}</span><button class="copy-button">Copiar</button>`;
+        codeHeader.innerHTML = <span class="language">${lenguaje || ''}</span><button class="copy-button">Copiar</button>;
         codeBlock.appendChild(codeHeader);
 
         // Agregar el código al bloque con Prism.js
         const codeElement = document.createElement('pre');
         const codeContent = document.createElement('code');
-        codeContent.classList.add(`language-${lenguaje || ''}`);
+        codeContent.classList.add(language-${lenguaje || ''});
         codeContent.textContent = codigo;
         codeElement.appendChild(codeContent);
         codeBlock.appendChild(codeElement);
 
         // Agregar evento al botón de copiar
         codeHeader.querySelector('.copy-button').addEventListener('click', () => {
-            console.log('Botón Copiar presionado'); // Log para verificar el clic
             navigator.clipboard.writeText(codigo)
                 .then(() => {
+                    // Cambiar el texto del botón a "Copiado!"
                     const button = codeHeader.querySelector('.copy-button');
                     button.innerText = '¡Copiado!';
                     setTimeout(() => {
@@ -75,7 +77,7 @@ function agregarMensaje(mensaje, isUser = false) {
     if (!isUser) {
         mensaje = mensaje.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); 
     }
-    messageElement.innerHTML = isUser ? `<strong>Tú:</strong> ${mensaje}` : `<strong>Gareth:</strong> ${mensaje}`;
+    messageElement.innerHTML = isUser ? <strong>Tú:</strong> ${mensaje} : <strong>Gareth:</strong> ${mensaje};
 
     if (!isUser && mensaje.includes('\\(')) { 
         renderizarLaTeX(messageElement);
@@ -132,12 +134,16 @@ function renderizarLaTeX(elemento) {
     elemento.innerHTML = resultado;
 }
 
-// Manejar clic en el botón "Nueva conversación"
-newConversationButton.addEventListener('click', () => {
-    console.log("Nueva conversación");
-    // Aquí puedes agregar el código para limpiar el área de chat y reiniciar la conversación.
-    location.reload();
-});
+  // Manejar clic en el botón "Nueva conversación"
+  newConversationButton.addEventListener('click', () => {
+      console.log("Nueva conversación");
+      
+      // Aquí puedes agregar el código para limpiar el área de chat
+      // y reiniciar la conversación.
+
+      // Recargar la página
+      location.reload();
+  });
 
 sendButton.addEventListener('click', handleUserInput);
 messageInput.addEventListener('keydown', (event) => {
@@ -147,13 +153,13 @@ messageInput.addEventListener('keydown', (event) => {
 });
 
 function adjustChatAreaPadding() {
-    const inputArea = document.querySelector('.input-area');
-    const chatArea = document.querySelector('.chat-area');
+const inputArea = document.querySelector('.input-area');
+const chatArea = document.querySelector('.chat-area');
 
-    if (inputArea && chatArea) { // Verificar que ambos elementos existan
-        const inputAreaHeight = inputArea.offsetHeight;
-        chatArea.style.paddingBottom = inputAreaHeight + 10 + 'px'; // Agregar 10px extra para mayor espacio
-    }
+if (inputArea && chatArea) { // Verificar que ambos elementos existan
+const inputAreaHeight = inputArea.offsetHeight;
+chatArea.style.paddingBottom = inputAreaHeight + 10 + 'px'; // Agregar 10px extra para mayor espacio
+}
 }
 
 // Llamar la función al cargar la página y al redimensionar la ventana
