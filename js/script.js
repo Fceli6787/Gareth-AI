@@ -26,6 +26,12 @@ async function handleUserInput() {
     }
 }
 
+function escapeHTML(html) {
+    const div = document.createElement('div');
+    div.innerText = html;
+    return div.innerHTML;
+}
+
 function agregarMensaje(mensaje, isUser = false) {
     const messageElement = document.createElement('div');
     messageElement.classList.add('chat-bubble');
@@ -34,17 +40,14 @@ function agregarMensaje(mensaje, isUser = false) {
     // Detectar bloques de código con la expresión regular
     const regex = /```(\w+)?\n([\s\S]*?)```/g;
     mensaje = mensaje.replace(regex, (match, lenguaje, codigo) => {
-        // Crear el contenedor del bloque de código
         const codeBlock = document.createElement('div');
         codeBlock.classList.add('code-block');
 
-        // Crear el encabezado con la etiqueta del lenguaje y el botón de copiar
         const codeHeader = document.createElement('div');
         codeHeader.classList.add('code-header');
         codeHeader.innerHTML = `<span class="language">${lenguaje || ''}</span><button class="copy-button">Copiar</button>`;
         codeBlock.appendChild(codeHeader);
 
-        // Agregar el código al bloque con Prism.js
         const codeElement = document.createElement('pre');
         const codeContent = document.createElement('code');
         codeContent.classList.add(`language-${lenguaje || ''}`);
@@ -52,11 +55,10 @@ function agregarMensaje(mensaje, isUser = false) {
         codeElement.appendChild(codeContent);
         codeBlock.appendChild(codeElement);
 
-        // Agregar evento al botón de copiar
+        // Evento para copiar el código
         codeHeader.querySelector('.copy-button').addEventListener('click', () => {
             navigator.clipboard.writeText(codigo)
                 .then(() => {
-                    // Cambiar el texto del botón a "Copiado!"
                     const button = codeHeader.querySelector('.copy-button');
                     button.innerText = '¡Copiado!';
                     setTimeout(() => {
@@ -65,11 +67,15 @@ function agregarMensaje(mensaje, isUser = false) {
                 })
                 .catch(err => {
                     console.error('Error al copiar el código: ', err);
+                    alert('No se pudo copiar el código. Intenta de nuevo.');
                 });
         });
 
-        return codeBlock.outerHTML; // Devolver el HTML del bloque de código
+        return codeBlock.outerHTML;
     });
+
+    // Escapar HTML para evitar que se renderice
+    mensaje = escapeHTML(mensaje);
 
     // Mensaje normal o con código ya formateado
     if (!isUser) {
@@ -132,16 +138,12 @@ function renderizarLaTeX(elemento) {
     elemento.innerHTML = resultado;
 }
 
-  // Manejar clic en el botón "Nueva conversación"
-  newConversationButton.addEventListener('click', () => {
-      console.log("Nueva conversación");
-      
-      // Aquí puedes agregar el código para limpiar el área de chat
-      // y reiniciar la conversación.
-
-      // Recargar la página
-      location.reload();
-  });
+// Manejar clic en el botón "Nueva conversación"
+newConversationButton.addEventListener('click', () => {
+    console.log("Nueva conversación");
+    // Aquí puedes agregar el código para limpiar el área de chat y reiniciar la conversación.
+    location.reload();
+});
 
 sendButton.addEventListener('click', handleUserInput);
 messageInput.addEventListener('keydown', (event) => {
@@ -151,13 +153,13 @@ messageInput.addEventListener('keydown', (event) => {
 });
 
 function adjustChatAreaPadding() {
-const inputArea = document.querySelector('.input-area');
-const chatArea = document.querySelector('.chat-area');
+    const inputArea = document.querySelector('.input-area');
+    const chatArea = document.querySelector('.chat-area');
 
-if (inputArea && chatArea) { // Verificar que ambos elementos existan
-const inputAreaHeight = inputArea.offsetHeight;
-chatArea.style.paddingBottom = inputAreaHeight + 10 + 'px'; // Agregar 10px extra para mayor espacio
-}
+    if (inputArea && chatArea) { // Verificar que ambos elementos existan
+        const inputAreaHeight = inputArea.offsetHeight;
+        chatArea.style.paddingBottom = inputAreaHeight + 10 + 'px'; // Agregar 10px extra para mayor espacio
+    }
 }
 
 // Llamar la función al cargar la página y al redimensionar la ventana
