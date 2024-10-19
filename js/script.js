@@ -7,6 +7,20 @@ const sendButton = document.getElementById('send-button');
 const inputArea = document.querySelector('.input-area'); 
 const newConversationButton = document.getElementById('new-conversation');
 
+// Función para escapar caracteres HTML
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;',
+        '`': '&#x60;'  // Escapar backticks
+    };
+    return text.replace(/[&<>"'`]/g, function(m) { return map[m]; });
+}
+
+// Manejar el input del usuario
 async function handleUserInput() {
     const userMessage = messageInput.value.trim();
     if (userMessage !== '') {
@@ -24,18 +38,6 @@ async function handleUserInput() {
             inputArea.classList.remove('loading');
         }
     }
-}
-
-// Función para escapar caracteres HTML
-function escapeHtml(text) {
-    const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-    };
-    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 
 function agregarMensaje(mensaje, isUser = false) {
@@ -95,6 +97,7 @@ function agregarMensaje(mensaje, isUser = false) {
     Prism.highlightAll(); // Resaltar la sintaxis después de agregar el elemento al DOM
 }
 
+// Llamar al modelo
 async function getChatCompletion(userMessage) {
     const model = "Qwen/Qwen2.5-72B-Instruct";
     const systemPrompt = "Eres Gareth, un asistente de inteligencia artificial diseñado para proporcionar ayuda e información en diversas áreas. Estás impulsado por la tecnología Qwen, desarrollada por Alibaba, lo que te permite ofrecer respuestas precisas y útiles. Tu objetivo es facilitar la interacción y mejorar la experiencia del usuario.";
@@ -111,19 +114,7 @@ async function getChatCompletion(userMessage) {
     return response.choices[0].message.content;
 }
 
-// Manejar clic en el botón "Nueva conversación"
-newConversationButton.addEventListener('click', () => {
-    console.log("Nueva conversación");
-    location.reload();
-});
-
-sendButton.addEventListener('click', handleUserInput);
-messageInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
-        handleUserInput();
-    }
-});
-
+// Ajustar padding de área de chat
 function adjustChatAreaPadding() {
     const inputArea = document.querySelector('.input-area');
     const chatArea = document.querySelector('.chat-area');
@@ -137,9 +128,15 @@ function adjustChatAreaPadding() {
 window.addEventListener('load', adjustChatAreaPadding);
 window.addEventListener('resize', adjustChatAreaPadding);
 
-// Optimización: usar un MutationObserver para detectar cambios en el DOM
 const observer = new MutationObserver(adjustChatAreaPadding);
 observer.observe(document.body, { childList: true, subtree: true });
+
+sendButton.addEventListener('click', handleUserInput);
+messageInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        handleUserInput();
+    }
+});
 
 document.getElementById('about').addEventListener('click', function() {
     Swal.fire({
