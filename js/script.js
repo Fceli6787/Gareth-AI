@@ -32,47 +32,53 @@ function agregarMensaje(mensaje, isUser = false) {
     const messageElement = document.createElement('div');
     messageElement.classList.add('chat-bubble', isUser ? 'user' : 'bot');
 
-    // Detectar bloques de código
-    const regex = /(\w+)?\n([\s\S]*?)/g;
-    mensaje = mensaje.replace(regex, (match, lenguaje, codigo) => {
-        const codeBlock = document.createElement('div');
-        codeBlock.classList.add('code-block');
+    // Detectar si hay contenido LaTeX
+    const latexRegex = /(\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\])/g;
+    const containsLaTeX = latexRegex.test(mensaje);
 
-        const codeHeader = document.createElement('div');
-        codeHeader.classList.add('code-header');
-        codeHeader.innerHTML = `<span class="language">${lenguaje || ''}</span><button class="copy-button">Copiar</button>`;
-        codeBlock.appendChild(codeHeader);
+    // Si no contiene LaTeX, buscar bloques de código
+    if (!containsLaTeX) {
+        const codeRegex = /(\w+)?\n([\s\S]*?)/g;
+        mensaje = mensaje.replace(codeRegex, (match, lenguaje, codigo) => {
+            const codeBlock = document.createElement('div');
+            codeBlock.classList.add('code-block');
 
-        const codeElement = document.createElement('pre');
-        const codeContent = document.createElement('code');
-        codeContent.classList.add(`language-${lenguaje || ''}`);
-        codeContent.textContent = codigo;
-        codeElement.appendChild(codeContent);
-        codeBlock.appendChild(codeElement);
+            const codeHeader = document.createElement('div');
+            codeHeader.classList.add('code-header');
+            codeHeader.innerHTML = `<span class="language">${lenguaje || ''}</span><button class="copy-button">Copiar</button>`;
+            codeBlock.appendChild(codeHeader);
 
-        codeHeader.querySelector('.copy-button').addEventListener('click', () => {
-            navigator.clipboard.writeText(codigo)
-                .then(() => {
-                    const button = codeHeader.querySelector('.copy-button');
-                    button.innerText = '¡Copiado!';
-                    setTimeout(() => {
-                        button.innerText = 'Copiar';
-                    }, 2000);
-                })
-                .catch(err => {
-                    console.error('Error al copiar el código: ', err);
-                });
+            const codeElement = document.createElement('pre');
+            const codeContent = document.createElement('code');
+            codeContent.classList.add(`language-${lenguaje || ''}`);
+            codeContent.textContent = codigo;
+            codeElement.appendChild(codeContent);
+            codeBlock.appendChild(codeElement);
+
+            codeHeader.querySelector('.copy-button').addEventListener('click', () => {
+                navigator.clipboard.writeText(codigo)
+                    .then(() => {
+                        const button = codeHeader.querySelector('.copy-button');
+                        button.innerText = '¡Copiado!';
+                        setTimeout(() => {
+                            button.innerText = 'Copiar';
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Error al copiar el código: ', err);
+                    });
+            });
+
+            return codeBlock.outerHTML;
         });
-
-        return codeBlock.outerHTML;
-    });
+    }
 
     if (!isUser) {
         mensaje = mensaje.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     }
     messageElement.innerHTML = isUser ? `<strong>Tú:</strong> ${mensaje}` : `<strong>Gareth:</strong> ${mensaje}`;
 
-    if (!isUser && mensaje.includes('\\(')) {
+    if (!isUser && containsLaTeX) {
         renderizarLaTeX(messageElement);
     }
 
@@ -101,7 +107,7 @@ async function getChatCompletion(userMessage) {
 // Función para renderizar LaTeX
 function renderizarLaTeX(elemento) {
     const textoOriginal = elemento.innerHTML;
-    const regex = /(\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\]|\(\\[^\)]*?\)\)|\\\([^\)]*\\\))/g;
+    const regex = /(\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\])/g;
     let resultado = '';
     let ultimoIndice = 0;
 
