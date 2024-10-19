@@ -51,7 +51,7 @@ function agregarMensaje(mensaje, isUser = false) {
         const codeElement = document.createElement('pre');
         const codeContent = document.createElement('code');
         codeContent.classList.add(`language-${lenguaje || ''}`);
-        codeContent.textContent = codigo;
+        codeContent.textContent = escapeHTML(codigo); // Escapar el código aquí
         codeElement.appendChild(codeContent);
         codeBlock.appendChild(codeElement);
 
@@ -74,7 +74,7 @@ function agregarMensaje(mensaje, isUser = false) {
         return codeBlock.outerHTML;
     });
 
-    // Escapar HTML para evitar que se renderice
+    // Escapar el HTML del mensaje para evitar que se renderice
     mensaje = escapeHTML(mensaje);
 
     // Mensaje normal o con código ya formateado
