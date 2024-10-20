@@ -1,4 +1,4 @@
-import { HfInference } from 'https://cdn.jsdelivr.net/npm/@huggingface/inference/+esm';
+import { HfInference } from 'https://cdn.jsdelivr.net/npm/@huggingface/inference@2.8.1/+esm';
 
 const inference = new HfInference("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");
 const chatMessages = document.getElementById('chat-messages');
