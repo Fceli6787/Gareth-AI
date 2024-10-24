@@ -182,3 +182,11 @@ document.getElementById('about').addEventListener('click', function() {
         backdrop: 'rgba(0,0,123,0.4)'
     });
 });
+
+window.addEventListener('load', () => {
+    adjustChatAreaPadding();
+    const audio = document.getElementById('audio');
+    audio.play().catch(error => {
+        console.error('Error al reproducir el audio:', error);
+    });
+});
