@@ -7,6 +7,8 @@ const sendButton = document.getElementById('send-button');
 const inputArea = document.querySelector('.input-area');
 const newConversationButton = document.getElementById('new-conversation');
 
+let chatHistory = [];
+
 async function handleUserInput() {
     const userMessage = messageInput.value.trim();
     if (userMessage !== '') {
@@ -14,9 +16,14 @@ async function handleUserInput() {
         messageInput.value = '';
         inputArea.classList.add('loading');
 
+        // Agregar el mensaje del usuario al historial
+        chatHistory.push({ role: "user", content: userMessage });
+
         try {
-            const botResponse = await getChatCompletion(userMessage);
+            const botResponse = await getChatCompletion(chatHistory);
             agregarMensaje(botResponse, false);
+            // Agregar la respuesta del bot al historial
+            chatHistory.push({ role: "assistant", content: botResponse });
         } catch (error) {
             console.error('Error al obtener respuesta del modelo:', error);
             agregarMensaje('Lo siento, hubo un error al procesar tu solicitud.', false);
@@ -37,16 +44,13 @@ function agregarMensaje(mensaje, isUser = false) {
     // Detectar bloques de código con la expresión regular
     const regex = /```(\w+)?\n([\s\S]*?)```/g;
     mensaje = mensaje.replace(regex, (match, lenguaje, codigo) => {
-        // Crear el contenedor del bloque de código
         const codeBlock = document.createElement('div');
         codeBlock.classList.add('code-block');
 
-        // Crear el encabezado con la etiqueta del lenguaje y el botón de copiar
         const codeHeader = document.createElement('div');
         codeHeader.classList.add('code-header');
         codeHeader.innerHTML = `<span class="language">${lenguaje || ''}</span><button class="copy-button">Copiar</button>`;
         codeBlock.appendChild(codeHeader);
-
 
         const codeElement = document.createElement('pre');
         const codeContent = document.createElement('code');
@@ -72,7 +76,6 @@ function agregarMensaje(mensaje, isUser = false) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
     Prism.highlightAll();
 
-    // Agregar evento al botón de copiar después de insertar en el DOM
     const codeBlocks = messageElement.querySelectorAll('.code-block');
     codeBlocks.forEach(block => {
         const copyButton = block.querySelector('.copy-button');
@@ -94,8 +97,7 @@ function agregarMensaje(mensaje, isUser = false) {
     });
 }
 
-
-async function getChatCompletion(userMessage) {
+async function getChatCompletion(history) {
     const model = "Qwen/Qwen2.5-72B-Instruct";
     const systemPrompt = "Eres Gareth, un asistente de inteligencia artificial basado en Qwen, desarrollado por Alibaba. Tu objetivo es proporcionar información precisa y útil, interactuando de manera amigable y profesional. Habla únicamente el idioma que el usuario se dirija a ti y adáptate a sus necesidades, ofreciendo respuestas claras y relevantes en cada conversación.";
 
@@ -103,7 +105,7 @@ async function getChatCompletion(userMessage) {
         model: model,
         messages: [
             { role: "system", content: systemPrompt },
-            { role: "user", content: userMessage }
+            ...history // Enviar el historial de mensajes
         ],
         max_tokens: 16384
     });
@@ -153,7 +155,6 @@ messageInput.addEventListener('keydown', (event) => {
     }
 });
 
-
 function adjustChatAreaPadding() {
     const inputArea = document.querySelector('.input-area');
     const chatArea = document.querySelector('.chat-area');
@@ -167,11 +168,8 @@ function adjustChatAreaPadding() {
 window.addEventListener('load', adjustChatAreaPadding);
 window.addEventListener('resize', adjustChatAreaPadding);
 
-
 const observer = new MutationObserver(adjustChatAreaPadding);
 observer.observe(document.body, { childList: true, subtree: true });
-
-
 
 document.getElementById('about').addEventListener('click', function() {
     Swal.fire({
