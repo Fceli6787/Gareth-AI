@@ -172,16 +172,17 @@ const observer = new MutationObserver(adjustChatAreaPadding);
 observer.observe(document.body, { childList: true, subtree: true });
 
 document.getElementById('about').addEventListener('click', function() {
-    Swal.fire({
-        title: 'Acerca de Gareth AI',
-        text: 'Gareth AI está impulsado por el modelo de lenguaje de gran tamaño (LLM) Qwen2.5, desarrollado por QwenLM. Qwen2.5 es reconocido por su arquitectura avanzada y su excepcional capacidad para comprender y procesar lenguaje natural en múltiples idiomas.\n\nCréditos a los creadores de Qwen2.5 por su arduo trabajo y dedicación en el desarrollo de este innovador modelo. Para más detalles, puedes visitar el repositorio de GitHub de Qwen2.5.',
-        icon: 'info',
-        confirmButtonText: 'Aceptar',
-        width: '600px',
-        padding: '1em',
-        backdrop: 'rgba(0,0,123,0.4)'
-    });
+Swal.fire({
+    title: 'Acerca de Gareth AI',
+    html: 'Gareth AI está impulsado por el modelo de lenguaje de gran tamaño (LLM) Qwen2.5, desarrollado por QwenLM. Qwen2.5 es reconocido por su arquitectura avanzada y su excepcional capacidad para comprender y procesar lenguaje natural en múltiples idiomas.<br><br>Créditos a los creadores de Qwen2.5 por su arduo trabajo y dedicación en el desarrollo de este innovador modelo. Para más detalles, puedes visitar el <a href="https://github.com/QwenLM/Qwen2.5" target="_blank">repositorio de GitHub de Qwen2.5</a>.<br><br>Desarrollado por Andres Felipe Celi.',
+    icon: 'info',
+    confirmButtonText: 'Aceptar',
+    width: '600px',
+    padding: '1em',
+    backdrop: 'rgba(0,0,123,0.4)'
 });
+
+
 
 window.addEventListener('load', () => {
     adjustChatAreaPadding();
