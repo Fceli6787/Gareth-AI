@@ -181,3 +181,4 @@ Swal.fire({
     padding: '1em',
     backdrop: 'rgba(0,0,123,0.4)'
 });
+});
