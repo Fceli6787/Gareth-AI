@@ -168,10 +168,32 @@ function agregarImagen(imageUrl) {
     const imageElement = document.createElement('img');
     imageElement.src = imageUrl;
     imageElement.alt = 'Imagen generada por IA';
+
+    // Ajustar el tamaño de la imagen después de cargarla
+    imageElement.onload = function() {
+        adjustImageSize(imageElement);
+    };
+
     messageElement.appendChild(imageElement);
 
     chatMessages.appendChild(messageElement);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Función para ajustar el tamaño de la imagen
+function adjustImageSize(image) {
+    const maxWidth = image.parentElement.offsetWidth; // Ancho máximo del contenedor
+    const maxHeight = 300; // Altura máxima (ajusta según tus necesidades)
+
+    if (image.width > maxWidth || image.height > maxHeight) {
+        if (image.width / image.height > maxWidth / maxHeight) {
+            image.style.width = maxWidth + 'px';
+            image.style.height = 'auto';
+        } else {
+            image.style.width = 'auto';
+            image.style.height = maxHeight + 'px';
+        }
+    }
 }
 
 async function query(data) {
@@ -179,7 +201,7 @@ async function query(data) {
         "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3.5-large",
         {
             headers: {
-                Authorization: "Bearer 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", // Reemplaza con tu clave API
+                Authorization: "Bearer hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", // Reemplaza con tu clave API
                 "Content-Type": "application/json",
             },
             method: "POST",
