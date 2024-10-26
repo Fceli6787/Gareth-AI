@@ -6,8 +6,10 @@ const messageInput = document.getElementById('message-input');
 const sendButton = document.getElementById('send-button');
 const inputArea = document.querySelector('.input-area');
 const newConversationButton = document.getElementById('new-conversation');
+const modelSwitch = document.getElementById('model-switch');
 
 let chatHistory = [];
+let currentModel = 'text'; // Iniciar en modo texto
 
 async function handleUserInput() {
     const userMessage = messageInput.value.trim();
@@ -16,19 +18,33 @@ async function handleUserInput() {
         messageInput.value = '';
         inputArea.classList.add('loading');
 
-        // Agregar el mensaje del usuario al historial
-        chatHistory.push({ role: "user", content: userMessage });
+        if (currentModel === 'text') {
+            // Agregar el mensaje del usuario al historial
+            chatHistory.push({ role: "user", content: userMessage });
 
-        try {
-            const botResponse = await getChatCompletion(chatHistory);
-            agregarMensaje(botResponse, false);
-            // Agregar la respuesta del bot al historial
-            chatHistory.push({ role: "assistant", content: botResponse });
-        } catch (error) {
-            console.error('Error al obtener respuesta del modelo:', error);
-            agregarMensaje('Lo siento, hubo un error al procesar tu solicitud.', false);
-        } finally {
-            inputArea.classList.remove('loading');
+            try {
+                const botResponse = await getChatCompletion(chatHistory);
+                agregarMensaje(botResponse, false);
+                // Agregar la respuesta del bot al historial
+                chatHistory.push({ role: "assistant", content: botResponse });
+            } catch (error) {
+                console.error('Error al obtener respuesta del modelo:', error);
+                agregarMensaje('Lo siento, hubo un error al procesar tu solicitud.', false);
+            } finally {
+                inputArea.classList.remove('loading');
+            }
+        } else {
+            // Modelo de imagen - Stable Diffusion
+            try {
+                const imageBlob = await query({ inputs: userMessage });
+                const imageUrl = URL.createObjectURL(imageBlob);
+                agregarImagen(imageUrl);
+            } catch (error) {
+                console.error('Error al generar la imagen:', error);
+                agregarMensaje('Lo siento, hubo un error al generar la imagen.', false);
+            } finally {
+                inputArea.classList.remove('loading');
+            }
         }
     }
 }
@@ -143,6 +159,37 @@ function renderizarLaTeX(elemento) {
     elemento.innerHTML = resultado;
 }
 
+// Función para agregar la imagen generada al chat
+function agregarImagen(imageUrl) {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('chat-bubble');
+    messageElement.classList.add('bot');
+
+    const imageElement = document.createElement('img');
+    imageElement.src = imageUrl;
+    imageElement.alt = 'Imagen generada por IA';
+    messageElement.appendChild(imageElement);
+
+    chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+async function query(data) {
+    const response = await fetch(
+        "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3.5-large",
+        {
+            headers: {
+                Authorization: "Bearer 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", // Reemplaza con tu clave API
+                "Content-Type": "application/json",
+            },
+            method: "POST",
+            body: JSON.stringify(data),
+        }
+    );
+    const result = await response.blob();
+    return result;
+}
+
 newConversationButton.addEventListener('click', () => {
     console.log("Nueva conversación");
     location.reload();
@@ -153,6 +200,12 @@ messageInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
         handleUserInput();
     }
+});
+
+// Agregar evento al switch para cambiar de modelo
+modelSwitch.addEventListener('change', () => {
+    currentModel = modelSwitch.checked ? 'image' : 'text';
+    messageInput.placeholder = currentModel === 'text' ? 'Introduce una petición aquí...' : 'Describe la imagen que deseas generar...';
 });
 
 function adjustChatAreaPadding() {
