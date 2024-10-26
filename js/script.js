@@ -201,7 +201,7 @@ async function query(data) {
         "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-3.5-large",
         {
             headers: {
-                Authorization: "Bearer hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", // Reemplaza con tu clave API
+                Authorization: "Bearer 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", // Reemplaza con tu clave API
                 "Content-Type": "application/json",
             },
             method: "POST",
