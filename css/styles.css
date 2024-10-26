@@ -218,6 +218,13 @@ input:checked + .slider:before {
     background-color: #0f3460; 
 }
 
+.chat-bubble.bot img {
+    max-width: 100%; /* Limitar el ancho máximo al 100% del contenedor */
+    max-height: 300px; /* Limitar la altura máxima a 300px (ajusta según tus necesidades) */
+    display: block; /* Para que la imagen ocupe todo el ancho disponible */
+    margin: 0 auto; /* Centrar la imagen horizontalmente */
+}
+
 .input-area {
     display: flex;
     margin-top: 20px;
