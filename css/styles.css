@@ -1,30 +1,25 @@
 body, html {
     margin: 0;
     padding: 0;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Inter', sans-serif;
     height: 100%;
-    background-color: #1a1a2e; 
-    color: #e0e0e0; 
-    /* Ancho fijo eliminado para que se ajuste al contenido */
-    overflow-x: hidden; 
-}
-
-#audio {
-    display: none;
+    background-color: #1a1c2a;
+    color: #e0e6ff;
+    overflow-x: hidden;
 }
 
 .container {
     display: flex;
     height: 100%;
-    width: 100%; /* Ancho ajustado al 100% */
+    width: 100%;
 }
 
 .sidebar {
     width: 280px;
-    background-color: #16213e;
+    background-color: #242738;
     padding: 20px;
-    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.3);
-    position: fixed; /* Posición fija para que la sidebar no se mueva */
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.4);
+    position: fixed;
     height: 100%;
     transition: width 0.3s ease;
 }
@@ -33,20 +28,20 @@ body, html {
     width: 300px;
 }
 
-.sidebar-content { 
+.sidebar-content {
     display: flex;
     flex-direction: column;
     height: 100%;
 }
 
-.sidebar-header { 
+.sidebar-header {
     margin-bottom: 30px;
     font-size: 24px;
     font-weight: bold;
-    color: #4ecca3;
+    color: #64ffda;
 }
 
-.sidebar-menu { 
+.sidebar-menu {
     flex-grow: 1;
 }
 
@@ -56,8 +51,8 @@ body, html {
     margin-bottom: 15px;
     border: none;
     border-radius: 8px;
-    background-color: #0f3460;
-    color: #fff;
+    background-color: #2d3142;
+    color: #e0e6ff;
     text-align: left;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -65,7 +60,8 @@ body, html {
 }
 
 .sidebar-menu button:hover {
-    background-color: #4ecca3;
+    background-color: #64ffda;
+    color: #1a1c2a;
     transform: translateX(5px);
 }
 
@@ -73,16 +69,15 @@ body, html {
     margin-right: 10px;
 }
 
-/* Estilo para el switch */
 .switch {
     position: relative;
     display: inline-block;
     width: 60px;
     height: 34px;
-    margin-bottom: 10px; /* Ajusta el margen inferior según tus necesidades */
+    margin-bottom: 10px;
 }
 
-.switch input { 
+.switch input {
     opacity: 0;
     width: 0;
     height: 0;
@@ -115,7 +110,7 @@ body, html {
 }
 
 input:checked + .slider {
-    background-color: #4CAF50; /* Color verde cuando está activo */
+    background-color: #64ffda;
 }
 
 input:focus + .slider {
@@ -128,10 +123,9 @@ input:checked + .slider:before {
     transform: translateX(26px);
 }
 
-/* Estilo para la etiqueta del switch */
 .switch-label {
     font-size: 14px;
-    color: #555;
+    color: #b3b9d1;
     margin-left: 10px;
 }
 
@@ -140,12 +134,11 @@ input:checked + .slider:before {
     padding: 30px;
     display: flex;
     flex-direction: column;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    border-left: 1px solid #4ecca3;
-    overflow: hidden; 
+    background: #242738;
+    border-left: 1px solid #3a3f5c;
+    overflow: hidden;
     margin-left: 280px;
     position: relative;
-    /* min-width ya no es necesario */ 
 }
 
 .top-bar {
@@ -153,23 +146,24 @@ input:checked + .slider:before {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
-    background-color: rgba(15, 52, 96, 0.5);
+    background-color: #2d3142;
     padding: 15px;
     border-radius: 10px;
 }
 
 .chat-area {
     max-height: 80vh;
-    overflow-y: scroll; /* Cambiado a 'scroll' para que funcione en todos los navegadores */
+    overflow-y: scroll;
     padding: 10px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-    ::-webkit-scrollbar { /* Chrome, Safari, and Opera */
-        display: none;
-    }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.chat-area::-webkit-scrollbar {
+    display: none;
 }
 
 @keyframes fadeInUp {
@@ -184,11 +178,11 @@ input:checked + .slider:before {
 }
 
 .chat-bubble {
-    background-color: #0f3460;
+    background-color: #3a3f5c;
     padding: 20px;
     border-radius: 20px;
     margin: 15px 0;
-    max-width: 60%; /* Ajusta este valor según sea necesario */
+    max-width: 60%;
     word-wrap: break-word;
     white-space: pre-wrap;
     overflow-wrap: break-word;
@@ -208,307 +202,288 @@ input:checked + .slider:before {
 }
 
 .chat-bubble.user {
-    background-color: #4ecca3;
-    color: #1a1a2e;
+    background-color: #4a5375;
+    color: #e0e6ff;
     align-self: flex-end;
 }
 
 .chat-bubble.bot {
     align-self: flex-start;
-    background-color: #0f3460; 
+    background-color: #3a3f5c;
+    color: #e0e6ff;
 }
 
 .chat-bubble.bot img {
-    max-width: 100%; /* Limitar el ancho máximo al 100% del contenedor */
-    max-height: 300px; /* Limitar la altura máxima a 300px (ajusta según tus necesidades) */
-    display: block; /* Para que la imagen ocupe todo el ancho disponible */
-    margin: 0 auto; /* Centrar la imagen horizontalmente */
+    max-width: 100%;
+    max-height: 300px;
+    display: block;
+    margin: 0 auto;
 }
 
 .input-area {
     display: flex;
     margin-top: 20px;
     padding: 20px;
-    background-color: rgba(15, 52, 96, 0.5);
+    background-color: #2d3142;
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    border-top: 2px solid #4ecca3;
+    border-top: 2px solid #3a3f5c;
     box-sizing: border-box;
+    gap: 10px; /* Añadimos un espacio entre elementos */
 }
 
 .input-box {
     flex-grow: 1;
-    padding: 15px;
+    padding: 15px 15px 15px 45px; /* Aumentamos el padding izquierdo para dejar espacio al botón */
     border: none;
-    background-color: #1a1a2e;
-    color: white;
-    border-radius: 25px; 
+    background-color: #3a3f5c;
+    color: #e0e6ff;
+    border-radius: 25px;
     transition: all 0.3s ease;
     font-size: 16px;
+    position: relative; /* Añadimos posición relativa */
 }
 
 .input-box:focus {
-    background-color: #16213e;
+    background-color: #4a5375;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(78, 204, 163, 0.5);
-}
-       
-       /*Boton no modificar */
-        .sparkle-button {
-          --active: 0;
-          --bg: radial-gradient(
-			40% 50% at center 100%,
-			hsl(270 calc(var(--active) * 97%) 72% / var(--active)),
-			transparent
-		),
-		radial-gradient(
-			80% 100% at center 120%,
-			hsl(260 calc(var(--active) * 97%) 70% / var(--active)),
-			transparent
-		),
-		hsl(260 calc(var(--active) * 97%) calc((var(--active) * 44%) + 12%));
-          background: var(--bg);
-          font-size: 1rem; 
-          font-weight: 500;
-          border: 0;
-          cursor: pointer;
-          padding: 0.8em 1em; 
-          display: flex;
-          align-items: center;
-          gap: 0.25em;
-          white-space: nowrap;
-          border-radius: 100px;
-          position: relative;
-          box-shadow: 0 0 calc(var(--active) * 3em) calc(var(--active) * 1em) hsl(260 97% 61% / 0.75),
-		0 0em 0 0 hsl(260 calc(var(--active) * 97%) calc((var(--active) * 50%) + 30%)) inset,
-		0 -0.05em 0 0 hsl(260 calc(var(--active) * 97%) calc(var(--active) * 60%)) inset;
-          transition: box-shadow var(--transition), scale var(--transition), background var(--transition);
-          scale: calc(1 + (var(--active) * 0.1));
-          transition: .3s;
-        }
-
-        .sparkle-button:active {
-          scale: 1;
-          transition: .3s;
-        }
-
-        .sparkle path {
-          color: hsl(0 0% calc((var(--active, 0) * 70%) + var(--base)));
-          transform-box: fill-box;
-          transform-origin: center;
-          fill: currentColor;
-          stroke: currentColor;
-          animation-delay: calc((var(--transition) * 1.5) + (var(--delay) * 1s));
-          animation-duration: 0.6s;
-          transition: color var(--transition);
-        }
-
-        .sparkle-button:is(:hover, :focus-visible) path {
-          animation-name: bounce;
-        }
-
-        @keyframes bounce {
-          35%, 65% {
-            scale: var(--scale);
-          }
-        }
-
-        .sparkle path:nth-of-type(1) {
-          --scale: 0.5;
-          --delay: 0.1;
-          --base: 40%;
-        }
-
-        .sparkle path:nth-of-type(2) {
-          --scale: 1.5;
-          --delay: 0.2;
-          --base: 20%;
-        }
-
-        .sparkle path:nth-of-type(3) {
-          --scale: 2.5;
-          --delay: 0.35;
-          --base: 30%;
-        }
-
-        .sparkle-button:before {
-          content: "";
-          position: absolute;
-          inset: -0.2em;
-          z-index: -1;
-          border: 0.25em solid hsl(260 97% 50% / 0.5);
-          border-radius: 100px;
-          opacity: var(--active, 0);
-          transition: opacity var(--transition);
-        }
-
-        .spark {
-          position: absolute;
-          inset: 0;
-          border-radius: 100px;
-          rotate: 0deg;
-          overflow: hidden;
-          mask: linear-gradient(white, transparent 50%);
-          animation: flip calc(var(--spark) * 2) infinite steps(2, end);
-        }
-
-        @keyframes flip {
-          to {
-            rotate: 360deg;
-          }
-        }
-
-        .spark:before {
-          content: "";
-          position: absolute;
-          width: 200%;
-          aspect-ratio: 1;
-          top: 0%;
-          left: 50%;
-          z-index: -1;
-          translate: -50% -15%;
-          rotate: 0;
-          transform: rotate(-90deg);
-          opacity: calc((var(--active)) + 0.4);
-          background: conic-gradient(
-		from 0deg,
-		transparent 0 340deg,
-		white 360deg
-	);
-          transition: opacity var(--transition);
-          animation: rotate var(--spark) linear infinite both;
-        }
-
-        .spark:after {
-          content: "";
-          position: absolute;
-          inset: var(--cut);
-          border-radius: 100px;
-        }
-
-        .backdrop {
-          position: absolute;
-          inset: var(--cut);
-          background: var(--bg);
-          border-radius: 100px;
-          transition: background var(--transition);
-        }
-
-        @keyframes rotate {
-          to {
-            transform: rotate(90deg);
-          }
-        }
-
-        @supports(selector(:has(:is(+ *)))) {
-          body:has(button:is(:hover, :focus-visible)) {
-            --active: 1;
-            --play-state: running;
-          }
-
-          .bodydrop {
-            display: none;
-          }
-        }
-
-        .sparkle-button:is(:hover, :focus-visible) ~ :is(.bodydrop, .particle-pen) {
-          --active: 1;
-          --play-state: runnin;
-        }
-
-        .sparkle-button:is(:hover, :focus-visible) {
-          --active: 1;
-          --play-state: running;
-        }
-
-        .sp {
-          position: relative;
-          display: flex;
-          justify-content: flex-end; /* Alinear el botón a la derecha */
-        }
-
-        .particle-pen {
-          position: absolute;
-          width: 200%;
-          aspect-ratio: 1;
-          top: 50%;
-          left: 50%;
-          translate: -50% -50%;
-          -webkit-mask: radial-gradient(white, transparent 65%);
-          z-index: -1;
-          opacity: var(--active, 0);
-          transition: opacity var(--transition);
-        }
-
-        .particle {
-          fill: white;
-          width: calc(var(--size, 0.25) * 1rem);
-          aspect-ratio: 1;
-          position: absolute;
-          top: calc(var(--y) * 1%);
-          left: calc(var(--x) * 1%);
-          opacity: var(--alpha, 1);
-          animation: float-out calc(var(--duration, 1) * 1s) calc(var(--delay) * -1s) infinite linear;
-          transform-origin: var(--origin-x, 1000%) var(--origin-y, 1000%);
-          z-index: -1;
-          animation-play-state: var(--play-state, paused);
-        }
-
-        .particle path {
-          fill: hsl(0 0% 90%);
-          stroke: none;
-        }
-
-        .particle:nth-of-type(even) {
-          animation-direction: reverse;
-        }
-
-        @keyframes float-out {
-          to {
-            rotate: 360deg;
-          }
-        }
-
-        .text {
-          translate: 2% -6%;
-          letter-spacing: 0.01ch;
-          background: linear-gradient(90deg, hsl(0 0% calc((var(--active) * 100%) + 65%)), hsl(0 0% calc((var(--active) * 100%) + 26%)));
-          -webkit-background-clip: text;
-          color: transparent;
-          transition: background var(--transition);
-        }
-
-        .sparkle-button svg {
-          inline-size: 1.25em;
-          translate: -25% -5%;
-        }
-        /*Seccion Boton no modificar*/
-
-        /* Estilos para el indicador de carga */
-        .loading-indicator {
-    display: none;
-    margin-left: 15px;
-    width: 25px;
-    height: 25px;
-    border: 4px solid #4ecca3;
-   border-radius: 50%;
-   border-top-color: transparent;
-   animation: spin 1s linear infinite;
+    box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.5);
 }
 
-.input-area.loading .loading-indicator {
-    display: block;
+.sparkle-button {
+    --active: 0;
+    --bg: radial-gradient(
+        40% 50% at center 100%,
+        hsl(270 calc(var(--active) * 97%) 72% / var(--active)),
+        transparent
+    ),
+    radial-gradient(
+        80% 100% at center 120%,
+        hsl(260 calc(var(--active) * 97%) 70% / var(--active)),
+        transparent
+    ),
+    hsl(260 calc(var(--active) * 97%) calc((var(--active) * 44%) + 12%));
+    background: var(--bg);
+    font-size: 1rem;
+    font-weight: 500;
+    border: 0;
+    cursor: pointer;
+    padding: 0.8em 1em;
+    display: flex;
+    align-items: center;
+    gap: 0.25em;
+    white-space: nowrap;
+    border-radius: 100px;
+    position: relative;
+    box-shadow: 0 0 calc(var(--active) * 3em) calc(var(--active) * 1em) hsl(260 97% 61% / 0.75),
+    0 0em 0 0 hsl(260 calc(var(--active) * 97%) calc((var(--active) * 50%) + 30%)) inset,
+    0 -0.05em 0 0 hsl(260 calc(var(--active) * 97%) calc(var(--active) * 60%)) inset;
+    transition: box-shadow var(--transition), scale var(--transition), background var(--transition);
+    scale: calc(1 + (var(--active) * 0.1));
+    transition: .3s;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+.sparkle-button:active {
+    scale: 1;
+    transition: .3s;
 }
+
+.sparkle path {
+    color: hsl(0 0% calc((var(--active, 0) * 70%) + var(--base)));
+    transform-box: fill-box;
+    transform-origin: center;
+    fill: currentColor;
+    stroke: currentColor;
+    animation-delay: calc((var(--transition) * 1.5) + (var(--delay) * 1s));
+    animation-duration: 0.6s;
+    transition: color var(--transition);
+}
+
+.sparkle-button:is(:hover, :focus-visible) path {
+    animation-name: bounce;
+}
+
+@keyframes bounce {
+    35%, 65% {
+        scale: var(--scale);
+    }
+}
+
+.sparkle path:nth-of-type(1) {
+    --scale: 0.5;
+    --delay: 0.1;
+    --base: 40%;
+}
+
+.sparkle path:nth-of-type(2) {
+    --scale: 1.5;
+    --delay: 0.2;
+    --base: 20%;
+}
+
+.sparkle path:nth-of-type(3) {
+    --scale: 2.5;
+    --delay: 0.35;
+    --base: 30%;
+}
+
+.sparkle-button:before {
+    content: "";
+    position: absolute;
+    inset: -0.2em;
+    z-index: -1;
+    border: 0.25em solid hsl(260 97% 50% / 0.5);
+    border-radius: 100px;
+    opacity: var(--active, 0);
+    transition: opacity var(--transition);
+}
+
+.spark {
+    position: absolute;
+    inset: 0;
+    border-radius: 100px;
+    rotate: 0deg;
+    overflow: hidden;
+    mask: linear-gradient(white, transparent 50%);
+    animation: flip calc(var(--spark) * 2) infinite steps(2, end);
+}
+
+@keyframes flip {
+    to {
+        rotate: 360deg;
+    }
+}
+
+.spark:before {
+    content: "";
+    position: absolute;
+    width: 200%;
+    aspect-ratio: 1;
+    top: 0%;
+    left: 50%;
+    z-index: -1;
+    translate: -50% -15%;
+    rotate: 0;
+    transform: rotate(-90deg);
+    opacity: calc((var(--active)) + 0.4);
+    background: conic-gradient(
+    from 0deg,
+    transparent 0 340deg,
+    white 360deg
+    );
+    transition: opacity var(--transition);
+    animation: rotate var(--spark) linear infinite both;
+}
+
+.spark:after {
+    content: "";
+    position: absolute;
+    inset: var(--cut);
+    border-radius: 100px;
+}
+
+.backdrop {
+    position: absolute;
+    inset: var(--cut);
+    background: var(--bg);
+    border-radius: 100px;
+    transition: background var(--transition);
+}
+
+@keyframes rotate {
+    to {
+        transform: rotate(90deg);
+    }
+}
+
+@supports(selector(:has(:is(+ *)))) {
+    body:has(button:is(:hover, :focus-visible)) {
+        --active: 1;
+        --play-state: running;
+    }
+
+    .bodydrop {
+        display: none;
+    }
+}
+
+.sparkle-button:is(:hover, :focus-visible) ~ :is(.bodydrop, .particle-pen) {
+    --active: 1;
+    --play-state: runnin;
+}
+
+.sparkle-button:is(:hover, :focus-visible) {
+    --active: 1;
+    --play-state: running;
+}
+
+.sp {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.particle-pen {
+    position: absolute;
+    width: 200%;
+    aspect-ratio: 1;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    -webkit-mask: radial-gradient(white, transparent 65%);
+    z-index: -1;
+    opacity: var(--active, 0);
+    transition: opacity var(--transition);
+}
+
+.particle {
+    fill: white;
+    width: calc(var(--size, 0.25) * 1rem);
+    aspect-ratio: 1;
+    position: absolute;
+    top: calc(var(--y) * 1%);
+    left: calc(var(--x) * 1%);
+    opacity: var(--alpha, 1);
+    animation: float-out calc(var(--duration, 1) * 1s) calc(var(--delay) * -1s) infinite linear;
+    transform-origin: var(--origin-x, 1000%) var(--origin-y, 1000%);
+    z-index: -1;
+    animation-play-state: var(--play-state, paused);
+}
+
+.particle path {
+    fill: hsl(0 0% 90%);
+    stroke: none;
+}
+
+.particle:nth-of-type(even) {
+    animation-direction: reverse;
+}
+
+@keyframes float-out {
+    to {
+        rotate: 360deg;
+    }
+}
+
+.text {
+    translate: 2% -6%;
+    letter-spacing: 0.01ch;
+    background: linear-gradient(90deg, hsl(0 0% calc((var(--active) * 100%) + 65%)), hsl(0 0% calc((var(--active) * 100%) + 26%)));
+    -webkit-background-clip: text;
+    color: transparent;
+    transition: background var(--transition);
+}
+
+.sparkle-button svg {
+    inline-size: 1.25em;
+    translate: -25% -5%;
+}
+
 
 .code-block {
-    background-color: rgba(15, 52, 96, 0.7);
+    background-color: #2d3142;
     border-radius: 10px;
     padding: 15px;
     margin-top: 10px;
@@ -519,7 +494,7 @@ input:checked + .slider:before {
 }
 
 .code-block:hover {
-    background-color: rgba(15, 52, 96, 0.9);
+    background-color:  #3a3f5c;
 }
 
 .code-block pre {
@@ -530,9 +505,9 @@ input:checked + .slider:before {
     position: absolute;
     top: 10px;
     right: 10px;
-    background-color: #4ecca3;
+    background-color: #64ffda;
     border: none;
-    color: #1a1a2e;
+    color: #1a1c2a;
     padding: 8px 12px;
     border-radius: 5px;
     cursor: pointer;
@@ -546,14 +521,14 @@ input:checked + .slider:before {
 }
 
 .copy-button:hover {
-    background-color: #3db892;
+    background-color: #4ecdc4;
 }
 
 .code-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: rgba(15, 52, 96, 0.9);
+    background-color: #3a3f5c;
     padding: 10px 15px;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
@@ -562,7 +537,7 @@ input:checked + .slider:before {
 
 .code-header .language {
     font-size: 0.9rem;
-    color: #4ecca3;
+    color: #b3b9d1;
     font-weight: bold;
 }
 
@@ -572,19 +547,19 @@ input:checked + .slider:before {
 }
 
 #new-conversation {
-    background-color: #4ecca3; /* Vibrant teal background */
-    color: #1a1a2e; /* Dark text for contrast */
+    background-color: #64ffda;
+    color: #1a1c2a;
     border: none;
-    border-radius: 30px; /* More rounded corners */
-    padding: 12px 25px; /* Slightly larger padding */
+    border-radius: 30px;
+    padding: 12px 25px;
     font-size: 16px;
-    font-weight: 600; /* Semi-bold text */
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease; /* Smooth transition for all properties */
-    width: 220px; /* Slightly wider */
-    text-transform: uppercase; /* Uppercase text for emphasis */
-    letter-spacing: 1px; /* Spaced out letters */
-    box-shadow: 0 4px 6px rgba(78, 204, 163, 0.2); /* Subtle shadow */
+    transition: all 0.3s ease;
+    width: 220px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 6px rgba(100, 255, 218, 0.2);
     position: relative;
     overflow: hidden;
 }
@@ -606,321 +581,312 @@ input:checked + .slider:before {
 }
 
 #new-conversation:hover {
-    background-color: #3db892; /* Slightly darker on hover */
-    color: #ffffff; /* White text on hover */
-    transform: translateY(-2px); /* Slight lift effect */
-    box-shadow: 0 6px 12px rgba(78, 204, 163, 0.3); /* Enhanced shadow on hover */
+    background-color: #4ecdc4;
+    color: #1a1c2a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(100, 255, 218, 0.3);
 }
 
 #new-conversation:hover:before {
-    left: 100%; /* Animate the gradient on hover */
+    left: 100%;
 }
 
 #new-conversation:active {
-    transform: translateY(1px); /* Press effect */
-    box-shadow: 0 2px 4px rgba(78, 204, 163, 0.2); /* Reduced shadow when pressed */
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(100, 255, 218, 0.2);
 }
 
 #about {
-  background-color: #4ecca3; /* Vibrant teal background */
-  color: #1a1a2e; /* Dark text for contrast */
-  border: none;
-  border-radius: 30px; /* More rounded corners */
-  padding: 12px 25px; /* Slightly larger padding */
-  font-size: 16px;
-  font-weight: 600; /* Semi-bold text */
-  cursor: pointer;
-  transition: all 0.3s ease; /* Smooth transition for all properties */
-  width: 220px; /* Slightly wider */
-  text-transform: uppercase; /* Uppercase text for emphasis */
-  letter-spacing: 1px; /* Spaced out letters */
-  box-shadow: 0 4px 6px rgba(78, 204, 163, 0.2); /* Subtle shadow */
-  position: relative;
-  overflow: hidden;
+    background-color: #64ffda;
+    color: #1a1c2a;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 220px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 6px rgba(100, 255, 218, 0.2);
+    position: relative;
+    overflow: hidden;
 }
 
 #about:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-      120deg,
-      transparent,
-      rgba(255, 255, 255, 0.3),
-      transparent
-  );
-  transition: all 0.4s;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    transition: all 0.4s;
 }
 
 #about:hover {
-  background-color: #3db892; /* Slightly darker on hover */
-  color: #ffffff; /* White text on hover */
-  transform: translateY(-2px); /* Slight lift effect */
-  box-shadow: 0 6px 12px rgba(78, 204, 163, 0.3); /* Enhanced shadow on hover */
+    background-color: #4ecdc4;
+    color: #1a1c2a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(100, 255, 218, 0.3);
 }
 
 #about:hover:before {
-  left: 100%; /* Animate the gradient on hover */
+    left: 100%;
 }
 
 #about:active {
-  transform: translateY(1px); /* Press effect */
-  box-shadow: 0 2px 4px rgba(78, 204, 163, 0.2); /* Reduced shadow when pressed */
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(100, 255, 218, 0.2);
 }
 
-
-/* Media query completo para dispositivos móviles */
 @media screen and (max-width: 768px) {
-  body, html {
-      font-size: 14px;
-      overflow-x: hidden;
-  }
+    body, html {
+        font-size: 14px;
+        overflow-x: hidden;
+    }
 
-  .container {
-      flex-direction: column;
-  }
+    .container {
+        flex-direction: column;
+    }
 
-  .sidebar {
-      width: 100%;
-      height: auto;
-      position: static;
-      padding: 10px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        padding: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
 
-  .sidebar-content {
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-  }
+    .sidebar-content {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-  .sidebar-header {
-      font-size: 18px;
-      margin-bottom: 0;
-  }
+    .sidebar-header {
+        font-size: 18px;
+        margin-bottom: 0;
+    }
 
-  .sidebar-menu {
-      display: flex;
-      flex-direction: row;
-  }
+    .sidebar-menu {
+        display: flex;
+        flex-direction: row;
+    }
 
-  #new-conversation, #about {
-      width: auto;
-      padding: 8px 12px;
-      font-size: 12px;
-      margin: 0 5px;
-  }
+    #new-conversation, #about {
+        width: auto;
+        padding: 8px 12px;
+        font-size: 12px;
+        margin: 0 5px;
+    }
 
-  .main-content {
-      margin-left: 0;
-      padding: 10px;
-      height: calc(100vh - 60px);
-  }
+    .main-content {
+        margin-left: 0;
+        padding: 10px;
+        height: calc(100vh - 60px);
+    }
 
-  .top-bar {
-      flex-direction: column;
-      padding: 10px;
-      margin-bottom: 15px;
-  }
+    .top-bar {
+        flex-direction: column;
+        padding: 10px;
+        margin-bottom: 15px;
+    }
 
-  .chat-area {
-      max-height: calc(100vh - 150px);
-      padding: 5px;
-  }
+    .chat-area {
+        max-height: calc(100vh - 150px);
+        padding: 5px;
+    }
 
-  .chat-bubble {
-      padding: 10px;
-      margin: 8px 0;
-      max-width: 85%;
-      font-size: 14px;
-  }
+    .chat-bubble {
+        padding: 10px;
+        margin: 8px 0;
+        max-width: 85%;
+        font-size: 14px;
+    }
 
-  .chat-bubble.user {
-      align-self: flex-end;
-      background-color: #3db892;
-  }
+    .chat-bubble.user {
+        align-self: flex-end;
+        background-color: #4a5375;
+    }
 
-  .chat-bubble.bot {
-      align-self: flex-start;
-      background-color: #0c2d4d;
-  }
+    .chat-bubble.bot {
+        align-self: flex-start;
+        background-color: #3a3f5c;
+    }
 
-  .input-area {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      padding: 10px;
-      background-color: rgba(15, 52, 96, 0.9);
-  }
+    .input-area {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 10px;
+        background-color: #2d3142;
+    }
 
-  .input-box {
-      font-size: 14px;
-      padding: 10px;
-      border-radius: 20px;
-  }
+    .input-box {
+        font-size: 14px;
+        padding: 10px;
+        border-radius: 20px;
+    }
 
-  .sparkle-button {
-      font-size: 12px;
-      padding: 8px 12px;
-  }
+    .sparkle-button {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
 
-  .code-block {
-      font-size: 12px;
-      padding: 10px;
-      margin-top: 8px;
-      border-radius: 8px;
-  }
+    .code-block {
+        font-size: 12px;
+        padding: 10px;
+        margin-top: 8px;
+        border-radius: 8px;
+    }
 
-  .code-header {
-      flex-direction: column;
-      align-items: flex-start;
-      padding: 8px;
-  }
+    .code-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 8px;
+    }
 
-  .code-header .language {
-      font-size: 12px;
-      margin-bottom: 5px;
-  }
+    .code-header .language {
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
 
-  .code-header .copy-button {
-      font-size: 12px;
-      padding: 4px 8px;
-      margin-top: 5px;
-  }
+    .code-header .copy-button {
+        font-size: 12px;
+        padding: 4px 8px;
+        margin-top: 5px;
+    }
 
-  .copy-button {
-      opacity: 1;
-      transform: none;
-  }
+    .copy-button {
+        opacity: 1;
+        transform: none;
+    }
 
-  pre {
-      font-size: 12px;
-      white-space: pre-wrap;
-      word-break: break-word;
-  }
+    pre {
+        font-size: 12px;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
 
-  /* Ajustes para mejorar la interactividad en táctil */
-  button, .input-box, .copy-button {
-      min-height: 44px;
-  }
+    button, .input-box, .copy-button {
+        min-height: 44px;
+    }
 
-  /* Animaciones más sutiles para mejorar el rendimiento */
-  .chat-bubble, .sparkle-button, #new-conversation, #about {
-      transition: all 0.2s ease;
-  }
+    .chat-bubble, .sparkle-button, #new-conversation, #about {
+        transition: all 0.2s ease;
+    }
 
-  /* Ajustes para el efecto sparkle en botones */
-  .sparkle-button {
-      --active: 0;
-      font-size: 12px;
-      padding: 8px 12px;
-  }
+    .sparkle-button {
+        --active: 0;
+        font-size: 12px;
+        padding: 8px 12px;
+    }
 
-  .sparkle path {
-      animation-duration: 0.4s;
-  }
+    .sparkle path {
+        animation-duration: 0.4s;
+    }
 
-  .spark {
-      --spark: 1.8s;
-  }
+    .spark {
+        --spark: 1.8s;
+    }
 
-  .backdrop {
-      --cut: 0.1em;
-  }
+    .backdrop {
+        --cut: 0.1em;
+    }
 
-  .particle-pen {
-      position: absolute;
-      width: 150%;
-      aspect-ratio: 1;
-  }
+    .particle-pen {
+        position: absolute;
+        width: 150%;
+        aspect-ratio: 1;
+    }
 
-  .particle {
-      width: calc(var(--size, 0.2) * 1rem);
-  }
+    .particle {
+        width: calc(var(--size, 0.2) * 1rem);
+    }
 
-  /* Ajustes para orientación horizontal */
-  @media (orientation: landscape) {
-      .sidebar {
-          width: 200px;
-          height: 100vh;
-          position: fixed;
-      }
+    @media (orientation: landscape) {
+        .sidebar {
+            width: 200px;
+            height: 100vh;
+            position: fixed;
+        }
 
-      .main-content {
-          margin-left: 200px;
-          height: 100vh;
-      }
+        .main-content {
+            margin-left: 200px;
+            height: 100vh;
+        }
 
-      .chat-area {
-          max-height: calc(100vh - 120px);
-      }
+        .chat-area {
+            max-height: calc(100vh - 120px);
+        }
 
-      .input-area {
-          left: 200px;
-          width: calc(100% - 200px);
-      }
-  }
+        .input-area {
+            left: 200px;
+            width: calc(100% - 200px);
+        }
+    }
 }
 
-/* Laptops (769px a 1024px) */
 @media screen and (min-width: 769px) and (max-width: 1024px) {
-  .sidebar {
-      width: 240px;
-  }
+    .sidebar {
+        width: 240px;
+    }
 
-  .main-content {
-      margin-left: 240px;
-  }
+    .main-content {
+        margin-left: 240px;
+    }
 
-  .chat-bubble {
-      max-width: 70%;
-  }
+    .chat-bubble {
+        max-width: 70%;
+    }
 
-  #new-conversation, #about {
-      width: 200px;
-  }
+    #new-conversation, #about {
+        width: 200px;
+    }
 }
 
-/* Monitores grandes (más de 1024px) */
 @media screen and (min-width: 1025px) {
-  .sidebar {
-      width: 280px;
-  }
+    .sidebar {
+        width: 280px;
+    }
 
-  .main-content {
-      margin-left: 280px;
-  }
+    .main-content {
+        margin-left: 280px;
+    }
 
-  .chat-bubble {
-      max-width: 60%;
-  }
+    .chat-bubble {
+        max-width: 60%;
+    }
 
-  #new-conversation, #about {
-      width: 220px;
-  }
+    #new-conversation, #about {
+        width: 220px;
+    }
 }
 
-/* Ajustes adicionales para mejorar la responsividad */
 @media screen and (max-width: 768px) {
-  .top-bar {
-      flex-direction: column;
-      align-items: stretch;
-  }
+    .top-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
 
-  .code-block {
-      font-size: 14px;
-  }
+    .code-block {
+        font-size: 14px;
+    }
 
-  .code-header {
-      flex-direction: column;
-      align-items: stretch;
-  }
+    .code-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
 
-  .code-header .copy-button {
-      margin-top: 10px;
-  }
+    .code-header .copy-button {
+        margin-top: 10px;
+    }
 }
