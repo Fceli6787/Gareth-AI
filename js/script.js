@@ -1,4 +1,4 @@
-import { HfInference } from 'https://cdn.jsdelivr.net/npm/@huggingface/inference@2.8.1/+esm';
+import { HfInference } from 'https://cdn.jsdelivr.net/npm/@huggingface/inference/+esm';
 
 const inference = new HfInference("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");
 const chatMessages = document.getElementById('chat-messages');
@@ -16,7 +16,6 @@ async function handleUserInput() {
     if (userMessage !== '') {
         agregarMensaje(userMessage, true);
         messageInput.value = '';
-        inputArea.classList.add('loading');
 
         if (currentModel === 'text') {
             // Agregar el mensaje del usuario al historial
@@ -24,14 +23,12 @@ async function handleUserInput() {
 
             try {
                 const botResponse = await getChatCompletion(chatHistory);
-                agregarMensaje(botResponse, false);
+                await agregarMensajeConEfecto(botResponse, false);
                 // Agregar la respuesta del bot al historial
                 chatHistory.push({ role: "assistant", content: botResponse });
             } catch (error) {
                 console.error('Error al obtener respuesta del modelo:', error);
-                agregarMensaje('Lo siento, hubo un error al procesar tu solicitud.', false);
-            } finally {
-                inputArea.classList.remove('loading');
+                await agregarMensajeConEfecto('Lo siento, hubo un error al procesar tu solicitud.', false);
             }
         } else {
             // Modelo de imagen - Stable Diffusion
@@ -41,9 +38,7 @@ async function handleUserInput() {
                 agregarImagen(imageUrl);
             } catch (error) {
                 console.error('Error al generar la imagen:', error);
-                agregarMensaje('Lo siento, hubo un error al generar la imagen.', false);
-            } finally {
-                inputArea.classList.remove('loading');
+                await agregarMensajeConEfecto('Lo siento, hubo un error al generar la imagen.', false);
             }
         }
     }
@@ -54,45 +49,65 @@ function agregarMensaje(mensaje, isUser = false) {
     messageElement.classList.add('chat-bubble');
     messageElement.classList.add(isUser ? 'user' : 'bot');
 
-    // Reemplazar ### por un estilo de encabezado
-    mensaje = mensaje.replace(/### (.+)/g, '<h3>$1</h3>');
-
-    // Detectar bloques de código con la expresión regular
-    const regex = /```(\w+)?\n([\s\S]*?)```/g;
-    mensaje = mensaje.replace(regex, (match, lenguaje, codigo) => {
-        const codeBlock = document.createElement('div');
-        codeBlock.classList.add('code-block');
-
-        const codeHeader = document.createElement('div');
-        codeHeader.classList.add('code-header');
-        codeHeader.innerHTML = `<span class="language">${lenguaje || ''}</span><button class="copy-button">Copiar</button>`;
-        codeBlock.appendChild(codeHeader);
-
-        const codeElement = document.createElement('pre');
-        const codeContent = document.createElement('code');
-        codeContent.classList.add(`language-${lenguaje || ''}`);
-        codeContent.textContent = codigo;
-        codeElement.appendChild(codeContent);
-        codeBlock.appendChild(codeElement);
-
-        return codeBlock.outerHTML;
-    });
-
-    if (!isUser) {
-        mensaje = mensaje.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    }
-
-    messageElement.innerHTML = isUser ? `<strong>Tú:</strong> ${mensaje}` : `<strong>Gareth:</strong> ${mensaje}`;
-
-    if (!isUser && mensaje.includes('\\(')) {
-        renderizarLaTeX(messageElement);
-    }
+    messageElement.innerHTML = isUser ? `<strong>Tú:</strong> ${mensaje}` : `<strong>Gareth:</strong> <span class="bot-response"></span>`;
 
     chatMessages.appendChild(messageElement);
     chatMessages.scrollTop = chatMessages.scrollHeight;
-    Prism.highlightAll();
 
-    const codeBlocks = messageElement.querySelectorAll('.code-block');
+    return messageElement;
+}
+
+async function agregarMensajeConEfecto(mensaje, isUser = false) {
+    const messageElement = agregarMensaje('', isUser);
+    if (!isUser) {
+        const botResponseSpan = messageElement.querySelector('.bot-response');
+        await typewriterEffect(botResponseSpan, mensaje);
+        aplicarFormatoEspecial(messageElement);
+    }
+}
+
+async function typewriterEffect(element, text) {
+    const delay = 10; // Reducir el tiempo de espera entre cada letra
+    for (let i = 0; i < text.length; i++) {
+        element.textContent += text[i];
+        await new Promise(resolve => setTimeout(resolve, delay));
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+}
+
+function aplicarFormatoEspecial(element) {
+    let content = element.innerHTML;
+
+    // Reemplazar ### por un estilo de encabezado
+    content = content.replace(/### (.+)/g, '<h3>$1</h3>');
+
+    // Detectar bloques de código
+    const regex = /```(\w+)?\n([\s\S]*?)```/g;
+    content = content.replace(regex, (match, lenguaje, codigo) => {
+        return `<div class="code-block">
+                    <div class="code-header">
+                        <span class="language">${lenguaje || ''}</span>
+                        <button class="copy-button">Copiar</button>
+                    </div>
+                    <pre><code class="language-${lenguaje || ''}">${codigo}</code></pre>
+                </div>`;
+    });
+
+    // Aplicar formato de negrita
+    content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+    element.innerHTML = content;
+
+    // Renderizar LaTeX si es necesario
+    if (content.includes('\\(')) {
+        renderizarLaTeX(element);
+    }
+
+    // Aplicar resaltado de sintaxis a los bloques de código
+    Prism.highlightAllUnder(element);
+
+    // Agregar funcionalidad de copia a los botones de código
+    const codeBlocks = element.querySelectorAll('.code-block');
     codeBlocks.forEach(block => {
         const copyButton = block.querySelector('.copy-button');
         const codeElement = block.querySelector('code');
@@ -101,7 +116,6 @@ function agregarMensaje(mensaje, isUser = false) {
             const codigoParaCopiar = codeElement.textContent;
 
             try {
-                await navigator.permissions.query({ name: 'clipboard-write' });
                 await navigator.clipboard.writeText(codigoParaCopiar);
                 copyButton.innerText = '¡Copiado!';
                 setTimeout(() => copyButton.innerText = 'Copiar', 2000);
@@ -131,7 +145,7 @@ async function getChatCompletion(history) {
 
 function renderizarLaTeX(elemento) {
     const textoOriginal = elemento.innerHTML;
-    const regex = /(\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\]|\(\\[^\)]*?\)\)|\\\([^\)]*\\\))/g;
+    const regex = /(\\$$[\s\S]*?\\$$|\\\[[\s\S]*?\\\]|$$\\[^$$]*?\)\)|\\$$[^$$]*\\\))/g;
     let resultado = '';
     let ultimoIndice = 0;
 
