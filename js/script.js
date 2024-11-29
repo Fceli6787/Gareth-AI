@@ -128,7 +128,7 @@ function aplicarFormatoEspecial(element) {
 }
 
 async function getChatCompletion(history) {
-    const model = "Qwen/Qwen2.5-72B-Instruct";
+    const model = "Qwen/QwQ-32B-Preview";
     const systemPrompt = "Eres Gareth, un asistente de inteligencia artificial basado en Qwen, desarrollado por Alibaba. Tu objetivo es proporcionar información precisa y útil, interactuando de manera amigable y profesional. Habla únicamente el idioma que el usuario se dirija a ti y adáptate a sus necesidades, ofreciendo respuestas claras y relevantes en cada conversación.";
 
     const response = await inference.chatCompletion({
