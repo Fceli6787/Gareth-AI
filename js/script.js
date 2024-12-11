@@ -1,6 +1,13 @@
 import { HfInference } from 'https://cdn.jsdelivr.net/npm/@huggingface/inference/+esm';
+import { OpenAI } from 'https://cdn.jsdelivr.net/npm/openai/+esm';
 
 const inference = new HfInference("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");
+const client = new OpenAI({
+    baseURL: "https://api-inference.huggingface.co/v1/",
+    apiKey: "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",
+    dangerouslyAllowBrowser: true
+});
+
 const chatMessages = document.getElementById('chat-messages');
 const messageInput = document.getElementById('message-input');
 const sendButton = document.getElementById('send-button');
@@ -67,13 +74,14 @@ async function agregarMensajeConEfecto(mensaje, isUser = false) {
 }
 
 async function typewriterEffect(element, text) {
-    const delay = 10; // Reducir el tiempo de espera entre cada letra
+    const delay = 5; // Reducir el tiempo de espera entre cada letra
     for (let i = 0; i < text.length; i++) {
         element.textContent += text[i];
         await new Promise(resolve => setTimeout(resolve, delay));
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 }
+
 
 function aplicarFormatoEspecial(element) {
     let content = element.innerHTML;
@@ -82,7 +90,7 @@ function aplicarFormatoEspecial(element) {
     content = content.replace(/### (.+)/g, '<h3>$1</h3>');
 
     // Detectar bloques de código
-    const regex = /```(\w+)?\n([\s\S]*?)```/g;
+    const regex = /(```(\w+)?\n([\s\S]*?)```)/g;
     content = content.replace(regex, (match, lenguaje, codigo) => {
         return `<div class="code-block">
                     <div class="code-header">
@@ -129,9 +137,9 @@ function aplicarFormatoEspecial(element) {
 
 async function getChatCompletion(history) {
     const model = "Qwen/QwQ-32B-Preview";
-    const systemPrompt = "Eres Gareth, un asistente de inteligencia artificial basado en Qwen, desarrollado por Alibaba. Tu objetivo es proporcionar información precisa y útil, interactuando de manera amigable y profesional. Habla únicamente el idioma que el usuario se dirija a ti y adáptate a sus necesidades, ofreciendo respuestas claras y relevantes en cada conversación.";
+    const systemPrompt = "Eres Gareth, un asistente de inteligencia artificial basado en Qwen, desarrollado por Alibaba. Tu objetivo es proporcionar información precisa y útil, interactuando de manera amigable y profesional. Hablaras únicamente el idioma que el usuario se dirija a ti y adáptate a sus necesidades, ofreciendo respuestas claras y relevantes en cada conversación.";
 
-    const response = await inference.chatCompletion({
+    const chatCompletion = await client.chat.completions.create({
         model: model,
         messages: [
             { role: "system", content: systemPrompt },
@@ -140,12 +148,12 @@ async function getChatCompletion(history) {
         max_tokens: 8192
     });
 
-    return response.choices[0].message.content;
+    return chatCompletion.choices[0].message.content;
 }
 
 function renderizarLaTeX(elemento) {
     const textoOriginal = elemento.innerHTML;
-    const regex = /(\\$$[\s\S]*?\\$$|\\\[[\s\S]*?\\\]|$$\\[^$$]*?\)\)|\\$$[^$$]*\\\))/g;
+    const regex = /(\\$$[\s\S]*?\\$$|\\\[[\s\S]*?\\\]|\\\(.*?\\\)|\\\[.*?\\\])/g;
     let resultado = '';
     let ultimoIndice = 0;
 
@@ -153,8 +161,8 @@ function renderizarLaTeX(elemento) {
         resultado += textoOriginal.slice(ultimoIndice, indice);
 
         try {
-            const esDisplayMode = formula.startsWith('\\[') || formula.startsWith('(\\[');
-            const formulaLimpia = formula.slice(esDisplayMode ? (formula.startsWith('(\\[') ? 3 : 2) : (formula.startsWith('\\(') ? 2 : 1), -1 * (esDisplayMode ? (formula.startsWith('(\\[') ? 3 : 2) : (formula.startsWith('\\(') ? 2 : 1)));
+            const esDisplayMode = formula.startsWith('\\[') || formula.startsWith('\\(');
+            const formulaLimpia = formula.slice(esDisplayMode ? 2 : 1, -1 * (esDisplayMode ? 2 : 1));
 
             const formulaRendered = katex.renderToString(formulaLimpia, {
                 displayMode: esDisplayMode,
