@@ -137,7 +137,7 @@ async function getChatCompletion(history) {
             { role: "system", content: systemPrompt },
             ...history // Enviar el historial de mensajes
         ],
-        max_tokens: 16384
+        max_tokens: 8192
     });
 
     return response.choices[0].message.content;
