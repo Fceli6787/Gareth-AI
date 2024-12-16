@@ -1,4 +1,4 @@
-/* Base styles */
+/* Base Styles */
 body, html {
     height: 100%;
     margin: 0;
@@ -7,7 +7,7 @@ body, html {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-/* Scrollbar styles */
+/* Scrollbar Styles */
 .chat-messages::-webkit-scrollbar {
     width: 6px;
 }
@@ -22,7 +22,7 @@ body, html {
     background: #555;
 }
 
-/* Code block styles */
+/* Code Block Styles */
 .code-block {
     background-color: #2d3748;
     border-radius: 5px;
@@ -46,10 +46,11 @@ body, html {
     cursor: pointer;
 }
 .code-block pre {
-    padding-left: 5px;
+    padding: 10px;
+    margin: 0;
 }
 
-/* Message styles */
+/* Message Styles */
 .message {
     margin-bottom: 10px;
     padding: 10px;
@@ -69,7 +70,7 @@ body, html {
     color: white;
 }
 
-/* Thinking animation */
+/* Thinking Animation */
 .thinking {
     animation: pulse 1.5s infinite;
 }
@@ -80,8 +81,8 @@ body, html {
 
 /* Responsive Design Media Queries */
 
-/* iPhone 13 (typical dimensions: 390x844 pixels) */
-@media screen and (max-width: 414px) and (max-height: 896px) {
+/* iPhone 12 Pro (typical dimensions: 390x844 pixels) */
+@media screen and (max-width: 428px) and (max-height: 926px) {
     body {
         font-size: 14px;
     }
@@ -91,6 +92,9 @@ body, html {
     }
     .code-block {
         font-size: 12px;
+    }
+    .code-block pre {
+        padding: 8px;
     }
     .chat-messages::-webkit-scrollbar {
         width: 4px;
@@ -109,6 +113,12 @@ body, html {
     .code-block {
         font-size: 14px;
     }
+    .code-block pre {
+        padding: 10px;
+    }
+    .chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
 }
 
 /* Tablets and iPads in Landscape */
@@ -118,9 +128,16 @@ body, html {
     }
     .message {
         max-width: 75%;
+        padding: 12px;
     }
     .code-block {
         font-size: 14px;
+    }
+    .code-block pre {
+        padding: 12px;
+    }
+    .chat-messages::-webkit-scrollbar {
+        width: 6px;
     }
 }
 
@@ -131,10 +148,13 @@ body, html {
     }
     .message {
         max-width: 70%;
-        padding: 12px;
+        padding: 14px;
     }
     .code-block {
         font-size: 16px;
+    }
+    .code-block pre {
+        padding: 14px;
     }
     .chat-messages::-webkit-scrollbar {
         width: 8px;
@@ -148,9 +168,15 @@ body, html {
     }
     .message {
         max-width: 60%;
-        padding: 15px;
+        padding: 18px;
     }
     .code-block {
         font-size: 18px;
+    }
+    .code-block pre {
+        padding: 18px;
+    }
+    .chat-messages::-webkit-scrollbar {
+        width: 10px;
     }
 }
