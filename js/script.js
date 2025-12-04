@@ -2,10 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Importaciones de las bibliotecas necesarias
     import('https://cdn.jsdelivr.net/npm/@huggingface/inference/+esm').then(({ HfInference }) => {
         import('https://cdn.jsdelivr.net/npm/openai@4.76.3/+esm').then(({ OpenAI }) => {
-            const inference = new HfInference("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");
+            const inference = new HfInference("apiKey");
             const client = new OpenAI({
                 baseURL: "https://api-inference.huggingface.co/v1/",
-                apiKey: "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",
+                apiKey: "KEY-API",
                 dangerouslyAllowBrowser: true
             });
 
@@ -373,3 +373,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
