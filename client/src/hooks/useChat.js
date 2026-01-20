@@ -72,9 +72,7 @@ export const useChat = () => {
       setCurrentStreamedMessage('');
 
       try {
-        const url = new URL(`${import.meta.env.VITE_API_URL}/chat/stream`);
-
-        const response = await fetch(url, {
+        const response = await fetch('/api/chat/stream', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
