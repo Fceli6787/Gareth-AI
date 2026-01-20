@@ -6,7 +6,7 @@
 
 [![React](https://img.shields.io/badge/React-19.2.0-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://reactjs.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-20+-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Mistral AI](https://img.shields.io/badge/Mistral_AI-Latest-FF6B6B?style=for-the-badge&logo=ai&logoColor=white)](https://mistral.ai/)
+[![Mistral AI](https://img.shields.io/badge/Mistral_AI-FF4F00?style=for-the-badge&logo=mistralai&logoColor=white)](https://mistral.ai/)
 [![Express](https://img.shields.io/badge/Express-5.2.1-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
 [![Vite](https://img.shields.io/badge/Vite-7.2.5-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 
